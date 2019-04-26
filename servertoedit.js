@@ -209,7 +209,7 @@ app.get('/404', (request, response) => {
 });
 
 
-app.get('/logout', redirectLogin, (req, res) => {
+app.get('/logout',(req, res) => {
     req.session.destroy(err => {
         if (err) {
             return res.redirect('/')
@@ -228,7 +228,7 @@ app.get('/404', (request, response) => {
 
 //Route to add to cart
 
-app.post('/add-to-cart', redirectLogin,(request, response)=> {
+app.post('/add-to-cart',(request, response)=> {
     //read from user_info to get _id,
     var db = utils.getDb();
     var userID = request.session.userId;
@@ -267,7 +267,7 @@ app.post('/add-to-cart', redirectLogin,(request, response)=> {
 
 });
 
-app.post('/delete-item', redirectLogin, (request, response)=> {
+app.post('/delete-item',(request, response)=> {
     var cart_item_id = request.body.item_id;
     var db = utils.getDb();
     db.collection('Accounts').update(
