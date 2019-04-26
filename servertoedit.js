@@ -55,6 +55,7 @@ app.use(express.static(__dirname + '/views'));
 
 const redirectLogin = (req, res, next) => {
     if (!req.session.userId) {
+        console.log('This redirects Login');
         res.redirect('/')
     }else{
         next()
@@ -63,6 +64,7 @@ const redirectLogin = (req, res, next) => {
 
 const redirectHome = (req, res, next) => {
     if (req.session.userId) {
+        console.log('This redirects Home');
         res.redirect('/home')
     }else{
         next()
