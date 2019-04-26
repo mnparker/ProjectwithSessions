@@ -155,17 +155,14 @@ app.post('/login', redirectHome, (req, res) => {
     var db = utils.getDb();
     db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
         if (feedbacks.length === 0) {
-            console.log(req.body)
             res.redirect('/login')
         } else {
             if(req.body.pwd === feedbacks[0].pwd) {
-                console.log(req.body)
                 req.session.userId = feedbacks[0].email;
                 console.log(`${req.session.userId} logged in`);
                 return res.redirect('/')
 
             }else{
-                console.log(req.body)
                 res.redirect('/login')
             }
         }
