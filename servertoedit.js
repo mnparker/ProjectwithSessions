@@ -151,11 +151,36 @@ app.get('/register',(req, res) => {
 
 });
 
+// app.post('/login',(req, res) => {
+//     var db = utils.getDb();
+//     db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
+//         if (feedbacks.length === 0) {
+//             res.redirect('/login')
+//         } else {
+//             if(req.body.pwd === feedbacks[0].pwd) {
+//                 req.session.userId = feedbacks[0].email;
+//                 console.log(`${req.session.userId} logged in`);
+//                 return res.redirect('/')
+//
+//             }else{
+//                 res.redirect('/login')
+//             }
+//         }
+//     });
+// });
+
 app.post('/login',(req, res) => {
     var db = utils.getDb();
-    db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
+    db.collection('Accounts').find({email: `${req.body.email}`}).toArray((err, feedbacks)=> {
+        if (err){
+            res.render('404.hbs',{
+                error: "Unable to connect to the database"
+            })
+        }
         if (feedbacks.length === 0) {
-            res.redirect('/login')
+            res.render('login.hbs',{
+
+            })
         } else {
             if(req.body.pwd === feedbacks[0].pwd) {
                 req.session.userId = feedbacks[0].email;
@@ -166,9 +191,8 @@ app.post('/login',(req, res) => {
                 res.redirect('/login')
             }
         }
-    });
+    })
 });
-
 
 app.post('/register',(req, res) => {
     var db = utils.getDb();
@@ -219,13 +243,6 @@ app.get('/logout',(req, res) => {
     })
 });
 
-app.get('/404', (request, response) => {
-    response.render('404', {
-        error: "Cannot connect to the server."
-    })
-});
-
-
 //Route to add to cart
 
 app.post('/add-to-cart',(request, response)=> {
@@ -240,7 +257,7 @@ app.post('/add-to-cart',(request, response)=> {
         }
         if (!doc){
             response.render('404',{
-                error: "Cannot connect to database"
+                error: "Item cannot be found."
             })
         }else{
             db.collection('Accounts').updateOne({"email": request.session.userId},
