@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({
 }));
 
 const {
-    PORT = 8080,
+    PORT = process.env.PORT || 8080,
     NODE_ENV = 'development',
     SESS_NAME = 'sid',
     SESS_SECRET = 'ssh!quiet,it\'asecrat!',
