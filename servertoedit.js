@@ -37,12 +37,11 @@ app.use(session({
     saveUninitialized: false,
     secret: SESS_SECRET,
     store: store,
-    httpOnly: false,
     cookie: {
         sameSite: true,
         proxy: true,
         secure: IN_PROD,
-        maxAge: 200000000
+        httpOnly: false
     }
 }));
 
