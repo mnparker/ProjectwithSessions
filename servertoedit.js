@@ -46,7 +46,7 @@ app.use(session({
     secret: SESS_SECRET,
     cookie: {
         sameSite: true,
-        secure: IN_PROD,
+        secure: false,
         maxAge: 60 * 60 * 24 * 7 //7 days
     }
 }));
