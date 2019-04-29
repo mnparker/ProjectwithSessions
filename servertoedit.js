@@ -210,13 +210,16 @@ app.post('/login',(req, res) => {
         }
         if (feedbacks.length === 0) {
             res.render('login.hbs',{
-
+                message: "something wrong"
             })
         } else {
+            console.log(feedbacks);
             if(req.body.pwd === feedbacks[0].pwd) {
                 req.session.userId = feedbacks[0].email;
                 console.log(`${req.session.userId} logged in`);
-                res.render('home.hbs')
+                res.render('home.hbs',{
+                    username: req.session.userId
+                })
 
             }else{
                 res.redirect('/login')
