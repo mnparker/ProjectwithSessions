@@ -135,7 +135,6 @@ app.get('/shop', redirectLogin, (request, response) => {
 
 app.get('/', (req, res) => {
     if('userId' in req.session){
-        console.log(req.session)
         res.render('home.hbs',{
             username: req.session.userId
         })
