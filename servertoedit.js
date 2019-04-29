@@ -12,7 +12,7 @@ var app = express();
 
 //Session store
 var store = new MongoDBStore({
-    uri: 'mongodb+srv://admin:mongodb@agileproject-qha9t.mongodb.net/test?retryWrites=true',
+    uri: 'mongodb+srv://admin:mongodb@agileproject-qha9t.mongodb.net/projectdb?retryWrites=true',
     collection: 'mySessions'
 });
 
@@ -141,22 +141,27 @@ app.get('/shop',(request, response) => {
 app.get('/', (req, res) => {
     var db = utils.getDb();
 
-    db.collection('mySessions').find({userId : req.session.userId}).toArray((err, doc) => {
-       if (err){
-           res.render('404.hbs',{
-               error: "Cannot connect to database"
-           })
-       }
-       if (doc.length === 0){
-           res.render('homenotlog.hbs')
-       }else{
-           const { userId } = req.session;
-            console.log(req.session)
-           res.render( `home.hbs`, {
-               username: req.session.userId
-           })
-       }
+    if (req.session.userId){
+        db.collection('mySessions').find({userId : req.session.userId}).toArray((err, doc) => {
+        if (err){
+            res.render('404.hbs',{
+                error: "Cannot connect to database"
+            })
+        }
+        if (doc.length === 0){
+            res.render('homenotlog.hbs')
+        }else{
+            const { userId } = req.session;
+            console.log(req.session);
+            res.render( `home.hbs`, {
+                username: req.session.userId
+            })
+        }
     })
+    }else{
+        res.render('homenotlog.hbs')
+    }
+
 });
 
 
