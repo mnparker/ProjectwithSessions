@@ -182,10 +182,11 @@ app.post('/login',(req, res) => {
 
             })
         } else {
+            console.log("hi");
             if(req.body.pwd === feedbacks[0].pwd) {
                 req.session.userId = feedbacks[0].email;
                 console.log(`${req.session.userId} logged in`);
-                return res.redirect('/')
+                res.redirect('/')
 
             }else{
                 res.redirect('/login')
@@ -206,11 +207,15 @@ app.post('/register',(req, res) => {
                     cart: []
                 });
                 req.session.userId = req.body.email;
-                return res.redirect('/')
+                res.redirect('/')
             }
-            res.redirect('/register')
+            res.render('sign_up',{
+                message: "Passwords do not match"
+            })
         } else {
-            res.redirect('/register')
+            res.render('sign_up',{
+                message: ["Account exists"]
+            })
         }
     })
 });
