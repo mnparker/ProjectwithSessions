@@ -151,7 +151,7 @@ app.get('/', (req, res) => {
            res.render('homenotlog.hbs')
        }else{
            const { userId } = req.session;
-
+            console.log(req.session)
            res.render( `home.hbs`, {
                username: req.session.userId
            })
