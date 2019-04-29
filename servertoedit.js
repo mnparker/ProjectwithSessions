@@ -141,7 +141,7 @@ app.get('/shop',(request, response) => {
 app.get('/', (req, res) => {
     var db = utils.getDb();
 
-    db.collection('mySessions').findOne({userId : req.session.userId}).toArray((err, doc) => {
+    db.collection('mySessions').find({userId : req.session.userId}).toArray((err, doc) => {
        if (err){
            res.render('404.hbs',{
                error: "Cannot connect to database"
