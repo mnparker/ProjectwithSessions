@@ -6,7 +6,21 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const expressValidator = require('express-validator');
 var ObjectId = require('mongodb').ObjectID;
+var MongoDBStore = require('connect-mongodb-session')(session);
 var app = express();
+
+
+//Session store
+var store = new MongoDBStore({
+    uri: 'mongodb+srv://admin:mongodb@agileproject-qha9t.mongodb.net/test?retryWrites=true',
+    collection: 'mySessions'
+});
+
+    // Catch errors
+store.on('error', function(error) {
+    console.log(error);
+});
+//session store close
 
 app.use(expressValidator());
 app.use(bodyParser.json());
@@ -33,7 +47,7 @@ app.use(session({
     cookie: {
         sameSite: true,
         secure: IN_PROD,
-        maxAge: 200000000
+        maxAge: 60 * 60 * 24 * 7 //7 days
     }
 }));
 
@@ -125,12 +139,25 @@ app.get('/shop',(request, response) => {
 //Shop page end
 
 app.get('/', (req, res) => {
-    const { userId } = req.session;
+    var db = utils.getDb();
+    db.collection('mySessions').findOne({userId : req.sessions.userId}, (err, doc) => {
+       if (err){
+           res.render('404.hbs',{
+               error: "Cannot connect to database"
+           })
+       }
 
-    res.render(`${userId ? `home.hbs` : `homenotlog.hbs`}`, {
-        username: req.session.userId
-    })
+       if (!doc){
+           res.render('homenotlog.hbs')
+       }
+       if (doc){
+           const { userId } = req.session;
 
+           res.render( `home.hbs`, {
+               username: req.session.userId
+           })
+       }
+    });
 });
 
 
@@ -172,7 +199,6 @@ app.get('/register',(req, res) => {
 app.post('/login',(req, res) => {
     var db = utils.getDb();
     db.collection('Accounts').find({email: `${req.body.email}`}).toArray((err, feedbacks)=> {
-        console.log(feedbacks[0].pwd);
         if (err){
             res.render('404.hbs',{
                 error: "Unable to connect to the database"
@@ -183,14 +209,12 @@ app.post('/login',(req, res) => {
 
             })
         } else {
-            console.log("hi");
             if(req.body.pwd === feedbacks[0].pwd) {
                 req.session.userId = feedbacks[0].email;
                 console.log(`${req.session.userId} logged in`);
-                res.redirect('/')
+                res.render('home.hbs')
 
             }else{
-                console.log("No");
                 res.redirect('/login')
             }
         }
@@ -236,17 +260,6 @@ app.post('/logout',(req, res) => {
 app.get('/404', (request, response) => {
     response.render('404', {
         error: "Cannot connect to the server."
-    })
-});
-
-
-app.get('/logout',(req, res) => {
-    req.session.destroy(err => {
-        if (err) {
-            return res.redirect('/')
-        }
-        res.clearCookie(SESS_NAME);
-        res.redirect('/')
     })
 });
 
