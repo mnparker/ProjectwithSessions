@@ -1,11 +1,13 @@
 const utils = require('./server_utils/mongo_util.js');
 const express = require('express');
-const session = require('express-session');
+const session1 = require('express-session');
 const hbs = require('hbs');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const expressValidator = require('express-validator');
 var ObjectId = require('mongodb').ObjectID;
+const http = require('http');
+const session = require('connect-mongo');
 var app = express();
 
 app.use(expressValidator());
@@ -14,28 +16,50 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
-const {
-    PORT = 8080,
-    NODE_ENV = 'development',
-    SESS_NAME = 'sid',
-    SESS_SECRET = 'ssh!quiet,it\'asecrat!',
-} = process.env;
+// const {
+//     PORT = 8080,
+//     NODE_ENV = 'development',
+//     SESS_NAME = 'sid',
+//     SESS_SECRET = 'ssh!quiet,it\'asecrat!',
+// } = process.env;
+//
+//
+// const IN_PROD = NODE_ENV === 'production';
+//
+//
+// app.use(session({
+//     name: SESS_NAME,
+//     resave: false,
+//     saveUninitialized: false,
+//     secret: SESS_SECRET,
+//     cookie: {
+//         sameSite: true,
+//         secure: IN_PROD,
+//         maxAge: 200000000
+//     }
+// }));
 
-
-const IN_PROD = NODE_ENV === 'production';
-
-
-app.use(session({
-    name: SESS_NAME,
-    resave: false,
-    saveUninitialized: false,
-    secret: SESS_SECRET,
-    cookie: {
-        sameSite: true,
-        secure: IN_PROD,
-        maxAge: 200000000
-    }
-}));
+app.configure(function() {
+    app.use(express.cookieParser());
+    app.use(express.session({
+        store: new session({
+            db: 'Accounts'
+        }),
+        secret: 'yoursecret',
+        cookie: {
+            path: '/',
+            maxAge: 1000 * 60 * 60 * 24 // 1 day
+        }
+    }));
+    app.use(function(req, res, next) {
+        res.header('Access-Control-Allow-Credentials', true);
+        res.header('Access-Control-Allow-Origin', req.headers.origin);
+        res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+        res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
+        next();
+    });
+    app.set('jsonp callback', true);
+});
 
 
 //Needed to use partials folder
