@@ -40,7 +40,7 @@ app.use(session({
     cookie: {
         sameSite: true,
         proxy: true,
-        secure: IN_PROD,
+        secure: false,
         httpOnly: false
     }
 }));
@@ -134,6 +134,7 @@ app.get('/shop', redirectLogin, (request, response) => {
 //Shop page end
 
 app.get('/', (req, res) => {
+    //const { userId} = req.session.userId
     if('userId' in req.session){
         res.render('home.hbs',{
             username: req.session.userId
