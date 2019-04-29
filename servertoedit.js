@@ -172,6 +172,7 @@ app.get('/register',(req, res) => {
 app.post('/login',(req, res) => {
     var db = utils.getDb();
     db.collection('Accounts').find({email: `${req.body.email}`}).toArray((err, feedbacks)=> {
+        console.log(feedbacks[0].pwd);
         if (err){
             res.render('404.hbs',{
                 error: "Unable to connect to the database"
