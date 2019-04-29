@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const expressValidator = require('express-validator');
 var ObjectId = require('mongodb').ObjectID;
+const MongoDBStore = require('connect-mongodb-session')(session);
 var app = express();
 
 app.use(expressValidator());
@@ -13,6 +14,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+
+var store = new MongoDBStore({
+    uri: 'mongodb+srv://admin:mongodb@agileproject-qha9t.mongodb.net/test?retryWrites=true',
+    collection: 'mySessions'
+});
 
 const {
     PORT = 8080,
@@ -30,6 +36,7 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     secret: SESS_SECRET,
+    store: store,
     cookie: {
         sameSite: true,
         proxy: true,
