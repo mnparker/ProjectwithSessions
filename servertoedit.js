@@ -8,6 +8,21 @@ const expressValidator = require('express-validator');
 var ObjectId = require('mongodb').ObjectID;
 const MongoDBStore = require('connect-mongodb-session')(session);
 var app = express();
+var cloudinary = require('cloudinary');
+
+
+var cloudConfig = cloudinary.config({
+    cloud_name: 'dmip4l7ub',
+    api_key: '597617937472994',
+    api_secret: '4OiCVMK85wAQBJmJqaMCvL5UDbo'
+});
+
+cloudinary.search(
+    .expression('converse');
+    .execute((err, result) => {
+        console.log(result)
+    })
+)
 
 app.use(expressValidator());
 app.use(bodyParser.json());
@@ -125,6 +140,7 @@ app.get('/shop', redirectLogin, (request, response) => {
                 products: productChunks,
                 username: request.session.userId
             })
+
         }
 
     });
@@ -136,13 +152,17 @@ app.get('/shop', redirectLogin, (request, response) => {
 app.get('/', (req, res) => {
     //const { userId} = req.session.userId
     if('userId' in req.session){
+        var status_code = 200;
         res.render('home.hbs',{
             username: req.session.userId
-        })
+        });
+        return status_code
     }else {
-        console.log(req.session);
-        res.render('homenotlog.hbs')
+        var status_code = 200;
+        res.render('homenotlog.hbs');
+        return status_code
     }
+
 
     // res.render(`${userId ? `home.hbs` : `homenotlog.hbs`}`, {
     //     username: req.session.userId
@@ -153,35 +173,48 @@ app.get('/', (req, res) => {
 
 app.get('/home', redirectLogin, (req, res) => {
     // const { user } = res.locals;
+    var status_code = 200;
     res.render('home.hbs', {
         username: req.session.userId
-    })
+    });
+    return status_code
 });
 
 app.get('/login', redirectHome, (req, res) => {
     console.log(req.session);
-    res.render('login.hbs')
+    var status_code = 200;
 
+    res.render('login.hbs');
+    return status_code
 });
 
 app.get('/register', redirectHome, (req, res) => {
-    res.render('sign_up.hbs')
-
+    var status_code = 200;
+    res.render('sign_up.hbs');
+    return status_code
 });
 
 app.post('/login', redirectHome, (req, res) => {
     var db = utils.getDb();
     db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
         if (feedbacks.length === 0) {
-            res.redirect('/login')
+            var status_code = 200;
+            res.redirect('/login');
+            return status_code
         } else {
             if(req.body.pwd === feedbacks[0].pwd) {
+                var status_code = 200;
                 req.session.userId = feedbacks[0].email;
                 console.log(`${req.session.userId} logged in`);
-                return res.redirect('/')
+                res.redirect('/');
+                return status_code
 
             }else{
-                res.redirect('/login')
+                var status_code = 200;
+                res.redirect('/login',{
+                    message: "Incorrect password"
+                })
+                return status_code
             }
         }
     });
@@ -288,7 +321,7 @@ app.post('/add-to-cart', redirectLogin,(request, response)=> {
 app.post('/delete-item', redirectLogin, (request, response)=> {
     var cart_item_id = request.body.item_id;
     var db = utils.getDb();
-    db.collection('Accounts').update(
+    db.collection('Accounts').updateOne(
         {"email": request.session.userId},
         { $pull: {cart: {item_id: ObjectId(cart_item_id)}} }
     );

@@ -4,13 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node servertoedit.js"
+    "start": "SET NODE_ENV=dev && node servertoedit.js",
+    "test": "mocha --timeout 10000"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.18.3",
+    "cloudinary": "^1.14.0",
     "connect-mongodb-session": "^2.1.1",
     "cookie-parser": "^1.4.4",
     "express": "^4.16.4",
@@ -21,5 +22,10 @@
     "mongodb": "^3.2.3",
     "mongoose": "^5.4.22",
     "url": "^0.11.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^6.1.4",
+    "chai-http": "^2.0.1"
   }
 }
