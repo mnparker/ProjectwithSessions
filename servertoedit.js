@@ -53,27 +53,27 @@ hbs.registerHelper('getCurrentYear', () => {
 app.set('view engine', 'hbs');
 app.use(express.static(__dirname + '/views'));
 
-// const redirectLogin = (req, res, next) => {
-//     if (!req.session.userId) {
-//         console.log('This redirects Login');
-//         res.redirect('/')
-//     }else{
-//         next()
-//     }
-// };
-//
-// const redirectHome = (req, res, next) => {
-//     if (req.session.userId) {
-//         console.log('This redirects Home');
-//         res.redirect('/home')
-//     }else{
-//         next()
-//     }
-// };
+const redirectLogin = (req, res, next) => {
+    if (!req.session.userId) {
+        console.log('This redirects Login');
+        res.redirect('/')
+    }else{
+        next()
+    }
+};
+
+const redirectHome = (req, res, next) => {
+    if (req.session.userId) {
+        console.log('This redirects Home');
+        res.redirect('/home')
+    }else{
+        next()
+    }
+};
 
 
 
-app.get('/my_cart',(request, response) => {
+app.get('/my_cart', redirectLogin, (request, response) => {
     var db = utils.getDb();
 
     db.collection('Accounts').find({email: `${request.session.userId}`}).toArray((err, docs)=>{
@@ -97,7 +97,7 @@ app.get('/my_cart',(request, response) => {
 //Shop page
 
 
-app.get('/shop',(request, response) => {
+app.get('/shop', redirectLogin, (request, response) => {
     var db = utils.getDb();
     db.collection('Shoes').find({}).toArray((err, docs) => {
         if (err) {
@@ -134,24 +134,24 @@ app.get('/', (req, res) => {
 });
 
 
-app.get('/home',(req, res) => {
+app.get('/home', redirectLogin, (req, res) => {
     // const { user } = res.locals;
     res.render('home.hbs', {
         username: req.session.userId
     })
 });
 
-app.get('/login',(req, res) => {
+app.get('/login', redirectHome, (req, res) => {
     res.render('login.hbs')
 
 });
 
-app.get('/register',(req, res) => {
+app.get('/register', redirectHome, (req, res) => {
     res.render('sign_up.hbs')
 
 });
 
-app.post('/login',(req, res) => {
+app.post('/login', redirectHome, (req, res) => {
     var db = utils.getDb();
     db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
         if (feedbacks.length === 0) {
@@ -170,7 +170,7 @@ app.post('/login',(req, res) => {
 });
 
 
-app.post('/register',(req, res) => {
+app.post('/register', redirectHome, (req, res) => {
     var db = utils.getDb();
     db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
         if (feedbacks.length === 0) {
@@ -191,7 +191,7 @@ app.post('/register',(req, res) => {
     })
 });
 
-app.post('/logout',(req, res) => {
+app.post('/logout', redirectLogin, (req, res) => {
     req.session.destroy(err => {
         if (err) {
             return res.redirect('/')
@@ -209,7 +209,7 @@ app.get('/404', (request, response) => {
 });
 
 
-app.get('/logout',(req, res) => {
+app.get('/logout', redirectLogin, (req, res) => {
     req.session.destroy(err => {
         if (err) {
             return res.redirect('/')
@@ -228,7 +228,7 @@ app.get('/404', (request, response) => {
 
 //Route to add to cart
 
-app.post('/add-to-cart',(request, response)=> {
+app.post('/add-to-cart', redirectLogin,(request, response)=> {
     //read from user_info to get _id,
     var db = utils.getDb();
     var userID = request.session.userId;
@@ -267,7 +267,7 @@ app.post('/add-to-cart',(request, response)=> {
 
 });
 
-app.post('/delete-item',(request, response)=> {
+app.post('/delete-item', redirectLogin, (request, response)=> {
     var cart_item_id = request.body.item_id;
     var db = utils.getDb();
     db.collection('Accounts').update(
