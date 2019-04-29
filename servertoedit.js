@@ -32,6 +32,7 @@ app.use(session({
     secret: SESS_SECRET,
     cookie: {
         sameSite: true,
+        proxy: true,
         secure: IN_PROD,
         maxAge: 200000000
     }
