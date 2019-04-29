@@ -6,27 +6,19 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const expressValidator = require('express-validator');
 var ObjectId = require('mongodb').ObjectID;
-var MongoDBStore = require('connect-mongodb-session')(session);
+const MongoDBStore = require('connect-mongodb-session')(session);
 var app = express();
-
-
-//Session store
-var store = new MongoDBStore({
-    uri: 'mongodb+srv://admin:mongodb@agileproject-qha9t.mongodb.net/projectdb?retryWrites=true',
-    collection: 'mySessions'
-});
-
-    // Catch errors
-store.on('error', function(error) {
-    console.log(error);
-});
-//session store close
 
 app.use(expressValidator());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+
+var store = new MongoDBStore({
+    uri: 'mongodb+srv://admin:mongodb@agileproject-qha9t.mongodb.net/projectdb?retryWrites=true',
+    collection: 'mySessions'
+});
 
 const {
     PORT = 8080,
@@ -44,10 +36,12 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     secret: SESS_SECRET,
+    store: store,
     cookie: {
         sameSite: true,
+        proxy: true,
         secure: false,
-        maxAge: 60 * 60 * 24 * 7 //7 days
+        httpOnly: false
     }
 }));
 
@@ -67,15 +61,15 @@ hbs.registerHelper('getCurrentYear', () => {
 app.set('view engine', 'hbs');
 app.use(express.static(__dirname + '/views'));
 
-// const redirectLogin = (req, res, next) => {
-//     if (!req.session.userId) {
-//         console.log('This redirects Login');
-//         res.redirect('/')
-//     }else{
-//         next()
-//     }
-// };
-//
+const redirectLogin = (req, res, next) => {
+    if (!req.session.userId) {
+        console.log('This redirects Login');
+        res.redirect('/')
+    }else{
+        next()
+    }
+};
+
 const redirectHome = (req, res, next) => {
     if (req.session.userId) {
         console.log('This redirects Home');
@@ -87,7 +81,7 @@ const redirectHome = (req, res, next) => {
 
 
 
-app.get('/my_cart',(request, response) => {
+app.get('/my_cart', redirectLogin, (request, response) => {
     var db = utils.getDb();
 
     db.collection('Accounts').find({email: `${request.session.userId}`}).toArray((err, docs)=>{
@@ -111,7 +105,8 @@ app.get('/my_cart',(request, response) => {
 //Shop page
 
 
-app.get('/shop',(request, response) => {
+app.get('/shop', redirectLogin, (request, response) => {
+    console.log(request.session);
     var db = utils.getDb();
     db.collection('Shoes').find({}).toArray((err, docs) => {
         if (err) {
@@ -139,96 +134,61 @@ app.get('/shop',(request, response) => {
 //Shop page end
 
 app.get('/', (req, res) => {
-    var db = utils.getDb();
-
-    if ('userId' in req.session){
-        db.collection('mySessions').find({userId : req.session.userId}).toArray((err, doc) => {
-        if (err){
-            res.render('404.hbs',{
-                error: "Cannot connect to database"
-            })
-        }
-        if (doc.length === 0){
-            res.render('homenotlog.hbs')
-        }else{
-            const { userId } = req.session;
-            console.log(req.session);
-            res.render( `home.hbs`, {
-                username: req.session.userId
-            })
-        }
-    })
-    }else{
+    //const { userId} = req.session.userId
+    if('userId' in req.session){
+        res.render('home.hbs',{
+            username: req.session.userId
+        })
+    }else {
+        console.log(req.session);
         res.render('homenotlog.hbs')
     }
+
+    // res.render(`${userId ? `home.hbs` : `homenotlog.hbs`}`, {
+    //     username: req.session.userId
+    // })
 
 });
 
 
-app.get('/home',(req, res) => {
+app.get('/home', redirectLogin, (req, res) => {
     // const { user } = res.locals;
     res.render('home.hbs', {
         username: req.session.userId
     })
 });
 
-app.get('/login',(req, res) => {
+app.get('/login', redirectHome, (req, res) => {
+    console.log(req.session);
     res.render('login.hbs')
 
 });
 
-app.get('/register',(req, res) => {
+app.get('/register', redirectHome, (req, res) => {
     res.render('sign_up.hbs')
 
 });
 
-// app.post('/login',(req, res) => {
-//     var db = utils.getDb();
-//     db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
-//         if (feedbacks.length === 0) {
-//             res.redirect('/login')
-//         } else {
-//             if(req.body.pwd === feedbacks[0].pwd) {
-//                 req.session.userId = feedbacks[0].email;
-//                 console.log(`${req.session.userId} logged in`);
-//                 return res.redirect('/')
-//
-//             }else{
-//                 res.redirect('/login')
-//             }
-//         }
-//     });
-// });
-
-app.post('/login',(req, res) => {
+app.post('/login', redirectHome, (req, res) => {
     var db = utils.getDb();
-    db.collection('Accounts').find({email: `${req.body.email}`}).toArray((err, feedbacks)=> {
-        if (err){
-            res.render('404.hbs',{
-                error: "Unable to connect to the database"
-            })
-        }
+    db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
         if (feedbacks.length === 0) {
-            res.render('login.hbs',{
-                message: "something wrong"
-            })
+            res.redirect('/login')
         } else {
-            console.log(feedbacks);
             if(req.body.pwd === feedbacks[0].pwd) {
                 req.session.userId = feedbacks[0].email;
                 console.log(`${req.session.userId} logged in`);
-                res.render('home.hbs',{
-                    username: req.session.userId
-                })
+                return res.redirect('/')
 
             }else{
                 res.redirect('/login')
             }
         }
-    })
+    });
 });
 
-app.post('/register',(req, res) => {
+
+app.post('/register', redirectHome, (req, res) => {
     var db = utils.getDb();
     db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
         if (feedbacks.length === 0) {
@@ -240,20 +200,16 @@ app.post('/register',(req, res) => {
                     cart: []
                 });
                 req.session.userId = req.body.email;
-                res.redirect('/')
+                return res.redirect('/')
             }
-            res.render('sign_up',{
-                message: "Passwords do not match"
-            })
+            res.redirect('/register')
         } else {
-            res.render('sign_up',{
-                message: ["Account exists"]
-            })
+            res.redirect('/register')
         }
     })
 });
 
-app.post('/logout',(req, res) => {
+app.post('/logout', redirectLogin, (req, res) => {
     req.session.destroy(err => {
         if (err) {
             return res.redirect('/')
@@ -270,9 +226,27 @@ app.get('/404', (request, response) => {
     })
 });
 
+
+app.get('/logout', redirectLogin, (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            return res.redirect('/')
+        }
+        res.clearCookie(SESS_NAME);
+        res.redirect('/')
+    })
+});
+
+app.get('/404', (request, response) => {
+    response.render('404', {
+        error: "Cannot connect to the server."
+    })
+});
+
+
 //Route to add to cart
 
-app.post('/add-to-cart',(request, response)=> {
+app.post('/add-to-cart', redirectLogin,(request, response)=> {
     //read from user_info to get _id,
     var db = utils.getDb();
     var userID = request.session.userId;
@@ -284,7 +258,7 @@ app.post('/add-to-cart',(request, response)=> {
         }
         if (!doc){
             response.render('404',{
-                error: "Item cannot be found."
+                error: "Cannot connect to database"
             })
         }else{
             db.collection('Accounts').updateOne({"email": request.session.userId},
@@ -311,7 +285,7 @@ app.post('/add-to-cart',(request, response)=> {
 
 });
 
-app.post('/delete-item',(request, response)=> {
+app.post('/delete-item', redirectLogin, (request, response)=> {
     var cart_item_id = request.body.item_id;
     var db = utils.getDb();
     db.collection('Accounts').update(
