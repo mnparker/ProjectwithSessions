@@ -139,6 +139,7 @@ app.get('/', (req, res) => {
             username: req.session.userId
         })
     }else {
+        console.log(req.session);
         res.render('homenotlog.hbs')
     }
 
