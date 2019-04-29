@@ -56,7 +56,7 @@ app.use(express.static(__dirname + '/views'));
 const redirectLogin = (req, res, next) => {
     if (!req.session.userId) {
         console.log('This redirects Login');
-        res.redirect('https://glacial-retreat-42071.herokuapp.com/')
+        res.redirect('/')
     }else{
         next()
     }
@@ -65,7 +65,7 @@ const redirectLogin = (req, res, next) => {
 const redirectHome = (req, res, next) => {
     if (req.session.userId) {
         console.log('This redirects Home');
-        res.redirect('https://glacial-retreat-42071.herokuapp.com/home')
+        res.redirect('/home')
     }else{
         next()
     }
@@ -155,15 +155,15 @@ app.post('/login', redirectHome, (req, res) => {
     var db = utils.getDb();
     db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
         if (feedbacks.length === 0) {
-            res.redirect('https://glacial-retreat-42071.herokuapp.com/login')
+            res.redirect('/login')
         } else {
             if(req.body.pwd === feedbacks[0].pwd) {
                 req.session.userId = feedbacks[0].email;
                 console.log(`${req.session.userId} logged in`);
-                return res.redirect('https://glacial-retreat-42071.herokuapp.com/')
+                return res.redirect('/')
 
             }else{
-                res.redirect('https://glacial-retreat-42071.herokuapp.com/login')
+                res.redirect('/login')
             }
         }
     });
@@ -182,11 +182,11 @@ app.post('/register', redirectHome, (req, res) => {
                     cart: []
                 });
                 req.session.userId = req.body.email;
-                return res.redirect('https://glacial-retreat-42071.herokuapp.com/')
+                return res.redirect('/')
             }
-            res.redirect('https://glacial-retreat-42071.herokuapp.com/register')
+            res.redirect('/register')
         } else {
-            res.redirect('https://glacial-retreat-42071.herokuapp.com/register')
+            res.redirect('/register')
         }
     })
 });
@@ -194,10 +194,10 @@ app.post('/register', redirectHome, (req, res) => {
 app.post('/logout', redirectLogin, (req, res) => {
     req.session.destroy(err => {
         if (err) {
-            return res.redirect('https://glacial-retreat-42071.herokuapp.com/')
+            return res.redirect('/')
         }
         res.clearCookie(SESS_NAME);
-        res.redirect('https://glacial-retreat-42071.herokuapp.com/')
+        res.redirect('/')
     })
 });
 
@@ -212,10 +212,10 @@ app.get('/404', (request, response) => {
 app.get('/logout', redirectLogin, (req, res) => {
     req.session.destroy(err => {
         if (err) {
-            return res.redirect('https://glacial-retreat-42071.herokuapp.com/')
+            return res.redirect('/')
         }
         res.clearCookie(SESS_NAME);
-        res.redirect('https://glacial-retreat-42071.herokuapp.com/')
+        res.redirect('/')
     })
 });
 
@@ -262,7 +262,7 @@ app.post('/add-to-cart', redirectLogin,(request, response)=> {
             //     path: doc.path,
             //     price: doc.price
             // });
-            response.redirect('https://glacial-retreat-42071.herokuapp.com/shop')}
+            response.redirect('/shop')}
     })
 
 });
@@ -282,7 +282,7 @@ app.post('/delete-item', redirectLogin, (request, response)=> {
     //         })
     //     }
     // });
-    response.redirect('https://glacial-retreat-42071.herokuapp.com/my_cart')
+    response.redirect('/my_cart')
 });
 
 app.listen(PORT, () => {
