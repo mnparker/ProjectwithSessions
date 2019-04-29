@@ -17,12 +17,7 @@ var cloudConfig = cloudinary.config({
     api_secret: '4OiCVMK85wAQBJmJqaMCvL5UDbo'
 });
 
-cloudinary.search(
-    .expression('converse');
-    .execute((err, result) => {
-        console.log(result)
-    })
-)
+
 
 app.use(expressValidator());
 app.use(bodyParser.json());
@@ -121,7 +116,6 @@ app.get('/my_cart', redirectLogin, (request, response) => {
 
 
 app.get('/shop', redirectLogin, (request, response) => {
-    console.log(request.session);
     var db = utils.getDb();
     db.collection('Shoes').find({}).toArray((err, docs) => {
         if (err) {
@@ -213,7 +207,7 @@ app.post('/login', redirectHome, (req, res) => {
                 var status_code = 200;
                 res.redirect('/login',{
                     message: "Incorrect password"
-                })
+                });
                 return status_code
             }
         }
