@@ -16,7 +16,7 @@ app.use(bodyParser.urlencoded({
 }));
 
 var store = new MongoDBStore({
-    uri: 'mongodb+srv://admin:mongodb@agileproject-qha9t.mongodb.net/test?retryWrites=true',
+    uri: 'mongodb+srv://admin:mongodb@agileproject-qha9t.mongodb.net/projectdb?retryWrites=true',
     collection: 'mySessions'
 });
 
