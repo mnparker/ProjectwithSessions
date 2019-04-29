@@ -140,13 +140,13 @@ app.get('/shop',(request, response) => {
 
 app.get('/', (req, res) => {
     var db = utils.getDb();
-    db.collection('mySessions').findOne({userId : req.sessions.userId}, (err, doc) => {
+
+    db.collection('mySessions').findOne({userId : req.session.userId}, (err, doc) => {
        if (err){
            res.render('404.hbs',{
                error: "Cannot connect to database"
            })
        }
-
        if (!doc){
            res.render('homenotlog.hbs')
        }
