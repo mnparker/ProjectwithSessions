@@ -106,6 +106,7 @@ app.get('/my_cart', redirectLogin, (request, response) => {
 
 
 app.get('/shop', redirectLogin, (request, response) => {
+    console.log(request.session);
     var db = utils.getDb();
     db.collection('Shoes').find({}).toArray((err, docs) => {
         if (err) {
@@ -133,11 +134,17 @@ app.get('/shop', redirectLogin, (request, response) => {
 //Shop page end
 
 app.get('/', (req, res) => {
-    const { userId } = req.session;
+    if('userId' in req.session){
+        res.render('home.hbs',{
+            username: req.session.userId
+        })
+    }else {
+        res.render('homenotlog.hbs')
+    }
 
-    res.render(`${userId ? `home.hbs` : `homenotlog.hbs`}`, {
-        username: req.session.userId
-    })
+    // res.render(`${userId ? `home.hbs` : `homenotlog.hbs`}`, {
+    //     username: req.session.userId
+    // })
 
 });
 
@@ -150,6 +157,7 @@ app.get('/home', redirectLogin, (req, res) => {
 });
 
 app.get('/login', redirectHome, (req, res) => {
+    console.log(req.session);
     res.render('login.hbs')
 
 });
