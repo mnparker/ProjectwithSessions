@@ -76,14 +76,14 @@ app.use(express.static(__dirname + '/views'));
 //     }
 // };
 //
-// const redirectHome = (req, res, next) => {
-//     if (req.session.userId) {
-//         console.log('This redirects Home');
-//         res.redirect('/home')
-//     }else{
-//         next()
-//     }
-// };
+const redirectHome = (req, res, next) => {
+    if (req.session.userId) {
+        console.log('This redirects Home');
+        res.redirect('/home')
+    }else{
+        next()
+    }
+};
 
 
 
@@ -141,7 +141,7 @@ app.get('/shop',(request, response) => {
 app.get('/', (req, res) => {
     var db = utils.getDb();
 
-    if (req.session.userId){
+    if ('userId' in req.session){
         db.collection('mySessions').find({userId : req.session.userId}).toArray((err, doc) => {
         if (err){
             res.render('404.hbs',{
