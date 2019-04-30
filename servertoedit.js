@@ -28,6 +28,7 @@ const {
 } = process.env;
 
 
+
 const IN_PROD = NODE_ENV === 'production';
 
 
@@ -73,7 +74,7 @@ const redirectLogin = (req, res, next) => {
 const redirectHome = (req, res, next) => {
     if (req.session.userId) {
         console.log('This redirects Home');
-        res.redirect('/home')
+        res.redirect('/')
     }else{
         next()
     }
@@ -160,12 +161,12 @@ app.get('/home', redirectLogin, (req, res) => {
 
 app.get('/login', redirectHome, (req, res) => {
     console.log(req.session);
-    res.render('login.hbs')
+    res.render('login_modal.hbs')
 
 });
 
 app.get('/register', redirectHome, (req, res) => {
-    res.render('sign_up.hbs')
+    res.render('sign_up_modal.hbs')
 
 });
 
