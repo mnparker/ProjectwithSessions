@@ -161,11 +161,13 @@ app.get('/home', redirectLogin, (req, res) => {
 
 app.get('/login', redirectHome, (req, res) => {
     console.log(req.session);
+    res.redirect('/');
     res.render('login_modal.hbs')
 
 });
 
 app.get('/register', redirectHome, (req, res) => {
+    res.redirect('/');
     res.render('sign_up_modal.hbs')
 
 });
