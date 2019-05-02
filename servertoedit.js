@@ -161,14 +161,18 @@ app.get('/home', redirectLogin, (req, res) => {
     res.render('home.hbs', {
         username: req.session.userId
     });
+
 });
 
 app.get('/login', redirectHome, (req, res) => {
-        res.render('login.hbs');
+    res.render('login.hbs');
 });
 
 app.get('/register', redirectHome, (req, res) => {
+    console.log(req.body);
     res.render('sign_up.hbs');
+
+
 });
 
 app.post('/login', redirectHome, (req, res) => {
@@ -305,13 +309,17 @@ app.post('/delete-item', redirectLogin, (request, response)=> {
     var number = parseInt(request.body.remove_num);
     var db = utils.getDb();
     db.collection('Accounts').findOne({email: request.session.userId, "cart.item_id": ObjectId(cart_item_id)}, (err, document)=>{
-        console.log(checkers.check_num(number));
-
         if (err){
             response.render('404.hbs',{
                 error: "Cannot connect to database"
             })
         }
+
+        if (typeof number !== 'number'){
+            response.send({
+                message: "Input must be a number."
+            })
+        }else{}
 
         var cart_string = JSON.stringify(document.cart, undefined, indent=4);
         var cart = JSON.parse(cart_string);
@@ -325,7 +333,7 @@ app.post('/delete-item', redirectLogin, (request, response)=> {
                 if (cart[i].quantity - number <= 0){
                     db.collection('Accounts').findOneAndUpdate({email: request.session.userId},
                         { $pull: {cart: {item_id: ObjectId(cart_item_id)}} }
-                        )
+                    )
                 }else{
                     db.collection('Accounts').findOneAndUpdate({email: request.session.userId, "cart.item_id": ObjectId(cart_item_id)},{
                         $inc: {
@@ -337,6 +345,7 @@ app.post('/delete-item', redirectLogin, (request, response)=> {
         }
     });
     response.redirect('/my_cart')
+
 });
 
 app.listen(PORT, () => {
