@@ -135,8 +135,24 @@ app.get('/shop', redirectLogin, (request, response) => {
 
 //
 //Shop page end
+app.get('',(req, res) => {
+    //const { userId} = req.session.userId
+    if('userId' in req.session){
+        res.render('home.hbs',{
+            username: req.session.userId
+        })
+    }else {
+        console.log(req.session);
+        res.render('homenotlog.hbs')
+    }
 
-app.get('/', redirectHome,(req, res) => {
+    // res.render(`${userId ? `home.hbs` : `homenotlog.hbs`}`, {
+    //     username: req.session.userId
+    // })
+
+});
+
+app.get('/',(req, res) => {
     //const { userId} = req.session.userId
     if('userId' in req.session){
         res.render('home.hbs',{
