@@ -135,29 +135,14 @@ app.get('/shop', redirectLogin, (request, response) => {
 
 //
 //Shop page end
-app.get('https://glacial-retreat-42071.herokuapp.com',(req, res) => {
-    //const { userId} = req.session.userId
-    if('userId' in req.session){
-        res.render('home.hbs',{
-            username: req.session.userId
-        })
-    }else {
-        console.log(req.session);
-        res.render('homenotlog.hbs')
-    }
-
-    // res.render(`${userId ? `home.hbs` : `homenotlog.hbs`}`, {
-    //     username: req.session.userId
-    // })
-
-});
 
 app.get('/',(req, res) => {
     //const { userId} = req.session.userId
     if('userId' in req.session){
-        res.render('home.hbs',{
-            username: req.session.userId
-        })
+        res.redirect('/home')
+        // res.render('home.hbs',{
+        //     username: req.session.userId
+        // })
     }else {
         console.log(req.session);
         res.render('homenotlog.hbs')
@@ -236,22 +221,6 @@ app.post('/register', redirectHome, (req, res) => {
     })
 });
 
-app.post('/logout', redirectLogin, (req, res) => {
-    req.session.destroy(err => {
-        if (err) {
-            return res.redirect('/')
-        }
-        res.clearCookie(SESS_NAME);
-        res.redirect('/')
-    })
-});
-
-
-app.get('/404', (request, response) => {
-    response.render('404', {
-        error: "Cannot connect to the server."
-    })
-});
 
 
 app.get('/logout', redirectLogin, (req, res) => {
