@@ -8,16 +8,7 @@ const expressValidator = require('express-validator');
 var ObjectId = require('mongodb').ObjectID;
 const MongoDBStore = require('connect-mongodb-session')(session);
 var app = express();
-var cloudinary = require('cloudinary');
-
-
-var cloudConfig = cloudinary.config({
-    cloud_name: 'dmip4l7ub',
-    api_key: '597617937472994',
-    api_secret: '4OiCVMK85wAQBJmJqaMCvL5UDbo'
-});
-
-
+var checkers = require('./server_utils/checkers.js');
 
 app.use(expressValidator());
 app.use(bodyParser.json());
@@ -83,7 +74,7 @@ const redirectLogin = (req, res, next) => {
 const redirectHome = (req, res, next) => {
     if (req.session.userId) {
         console.log('This redirects Home');
-        res.redirect('/home')
+        res.redirect('/home');
     }else{
         next()
     }
@@ -98,7 +89,8 @@ app.get('/my_cart', redirectLogin, (request, response) => {
         if (err){
             response.render('404.hbs',{
                 error: "Cannot connect to database"
-            })
+            });
+
         }
         var cart_list = [];
         for (var i = 0; i < docs[0].cart.length; i+= 1) {
@@ -107,7 +99,7 @@ app.get('/my_cart', redirectLogin, (request, response) => {
         response.render('my_cart.hbs',{
             products: cart_list,
             username: request.session.userId
-        })
+        });
     });
 });
 
@@ -117,13 +109,16 @@ app.get('/my_cart', redirectLogin, (request, response) => {
 
 app.get('/shop', redirectLogin, (request, response) => {
     var db = utils.getDb();
+
     db.collection('Shoes').find({}).toArray((err, docs) => {
         if (err) {
             response.render('404', { error: "Unable to connect to database" })
         }
 
         if (!docs){
-            throw err;
+            response.render('404.hbs', {
+                error: "Item does not exist"
+            });
         }else {
             var productChunks = [];
             var chunkSize = 3;
@@ -133,7 +128,7 @@ app.get('/shop', redirectLogin, (request, response) => {
             response.render('shop.hbs', {
                 products: productChunks,
                 username: request.session.userId
-            })
+            });
 
         }
 
@@ -146,15 +141,11 @@ app.get('/shop', redirectLogin, (request, response) => {
 app.get('/', (req, res) => {
     //const { userId} = req.session.userId
     if('userId' in req.session){
-        var status_code = 200;
         res.render('home.hbs',{
             username: req.session.userId
         });
-        return status_code
     }else {
-        var status_code = 200;
         res.render('homenotlog.hbs');
-        return status_code
     }
 
 
@@ -167,48 +158,35 @@ app.get('/', (req, res) => {
 
 app.get('/home', redirectLogin, (req, res) => {
     // const { user } = res.locals;
-    var status_code = 200;
     res.render('home.hbs', {
         username: req.session.userId
     });
-    return status_code
 });
 
 app.get('/login', redirectHome, (req, res) => {
-    console.log(req.session);
-    var status_code = 200;
-
-    res.render('login.hbs');
-    return status_code
+        res.render('login.hbs');
 });
 
 app.get('/register', redirectHome, (req, res) => {
-    var status_code = 200;
     res.render('sign_up.hbs');
-    return status_code
 });
 
 app.post('/login', redirectHome, (req, res) => {
     var db = utils.getDb();
     db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
+
         if (feedbacks.length === 0) {
-            var status_code = 200;
             res.redirect('/login');
-            return status_code
         } else {
             if(req.body.pwd === feedbacks[0].pwd) {
-                var status_code = 200;
                 req.session.userId = feedbacks[0].email;
                 console.log(`${req.session.userId} logged in`);
                 res.redirect('/');
-                return status_code
 
             }else{
-                var status_code = 200;
                 res.redirect('/login',{
                     message: "Incorrect password"
                 });
-                return status_code
             }
         }
     });
@@ -216,6 +194,7 @@ app.post('/login', redirectHome, (req, res) => {
 
 
 app.post('/register', redirectHome, (req, res) => {
+    console.log(req.body);
     var db = utils.getDb();
     db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
         if (feedbacks.length === 0) {
@@ -231,7 +210,7 @@ app.post('/register', redirectHome, (req, res) => {
             }
             res.redirect('/register')
         } else {
-            res.redirect('/register')
+            res.render('sign_up.hbs')
         }
     })
 });
@@ -288,25 +267,34 @@ app.post('/add-to-cart', redirectLogin,(request, response)=> {
                 error: "Cannot connect to database"
             })
         }else{
-            db.collection('Accounts').updateOne({"email": request.session.userId},
-                {
-                    $push: {
-                        "cart": {
-                            user_id: userID,
-                            item_id: doc._id,
-                            name: doc.name,
-                            path: doc.path,
-                            price: doc.price
-                        }
-                    }
-                });
-            // db.collection(`Cart_${userID}`).insertOne({
-            //     user_id: userID,
-            //     item_id: doc._id,
-            //     name: doc.name,
-            //     path: doc.path,
-            //     price: doc.price
-            // });
+            db.collection('Accounts').find({email: request.session.userId, "cart.item_id": doc._id}).toArray( (err, document)=>{
+                if (err){
+                    response.render('404.hbs',{
+                        error: "Cannot connect to database"
+                    })
+                }
+                if (document.length === 0){
+                    db.collection('Accounts').updateOne({"email": request.session.userId},
+                        {
+                            $push: {
+                                "cart": {
+                                    item_id: doc._id,
+                                    name: doc.name,
+                                    path: doc.path,
+                                    price: doc.price,
+                                    quantity: 1
+                                }
+                            }
+                        });
+                }else if(document.length === 1){
+                    db.collection('Accounts').updateOne({"email": request.session.userId, "cart.item_id": doc._id},
+                        {
+                            $inc: {
+                                "cart.$.quantity": 1
+                            }
+                        })
+                }
+            });
             response.redirect('/shop')}
     })
 
@@ -314,19 +302,40 @@ app.post('/add-to-cart', redirectLogin,(request, response)=> {
 
 app.post('/delete-item', redirectLogin, (request, response)=> {
     var cart_item_id = request.body.item_id;
+    var number = parseInt(request.body.remove_num);
     var db = utils.getDb();
-    db.collection('Accounts').updateOne(
-        {"email": request.session.userId},
-        { $pull: {cart: {item_id: ObjectId(cart_item_id)}} }
-    );
+    db.collection('Accounts').findOne({email: request.session.userId, "cart.item_id": ObjectId(cart_item_id)}, (err, document)=>{
+        console.log(checkers.check_num(number));
 
-    // db.collection(`Cart_${request.session.userId}`).deleteOne({_id: ObjectId(cart_item_id)}, (err,response)=> {
-    //     if (err){
-    //         response.render('404.hbs',{
-    //             error: "Database error"
-    //         })
-    //     }
-    // });
+        if (err){
+            response.render('404.hbs',{
+                error: "Cannot connect to database"
+            })
+        }
+
+        var cart_string = JSON.stringify(document.cart, undefined, indent=4);
+        var cart = JSON.parse(cart_string);
+
+
+        //Loops through account cart for the right product id
+        for (var i = 0; i < cart.length; i++){
+
+            if (cart[i].item_id === cart_item_id){
+                // If quantity is lower than or equal to 0, pull the product from the cart array
+                if (cart[i].quantity - number <= 0){
+                    db.collection('Accounts').findOneAndUpdate({email: request.session.userId},
+                        { $pull: {cart: {item_id: ObjectId(cart_item_id)}} }
+                        )
+                }else{
+                    db.collection('Accounts').findOneAndUpdate({email: request.session.userId, "cart.item_id": ObjectId(cart_item_id)},{
+                        $inc: {
+                            "cart.$.quantity": -`${number}`
+                        }
+                    });
+                }
+            }
+        }
+    });
     response.redirect('/my_cart')
 });
 
