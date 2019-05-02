@@ -135,7 +135,7 @@ app.get('/shop', redirectLogin, (request, response) => {
 
 //
 //Shop page end
-app.get('',(req, res) => {
+app.get('https://glacial-retreat-42071.herokuapp.com',(req, res) => {
     //const { userId} = req.session.userId
     if('userId' in req.session){
         res.render('home.hbs',{
