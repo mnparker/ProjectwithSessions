@@ -4,6 +4,7 @@ const session = require('express-session');
 const hbs = require('hbs');
 const bodyParser = require('body-parser');
 const fs = require('fs');
+const bcryptjs = require('bcryptjs');
 const expressValidator = require('express-validator');
 var ObjectId = require('mongodb').ObjectID;
 const MongoDBStore = require('connect-mongodb-session')(session);
@@ -41,6 +42,7 @@ app.use(session({
     cookie: {
         sameSite: true,
         proxy: true,
+        maxAge: 1000 * 60 * 60 * 24 * 2, //two days
         secure: false,
         httpOnly: false
     }
@@ -178,7 +180,7 @@ app.post('/login', redirectHome, (req, res) => {
         if (feedbacks.length === 0) {
             res.redirect('/login')
         } else {
-            if(req.body.pwd === feedbacks[0].pwd) {
+            if(bcryptjs.compareSync(req.body.pwd, feedbacks[0].pwd)) {
                 req.session.userId = feedbacks[0].email;
                 console.log(`${req.session.userId} logged in`);
                 return res.redirect('/')
@@ -197,13 +199,19 @@ app.post('/register', redirectHome, (req, res) => {
         if (feedbacks.length === 0) {
             if(req.body.pwd === req.body.pwd2) {
                 delete req.body._id; // for safety reasons
+                let salt = undefined;
+                bcryptjs.genSalt(10, (err, result) => {
+                    if (err)
+                        console.log(err);
+                    salt = result;
+                });
                 db.collection('Accounts').insertOne({
                     email: req.body.email,
-                    pwd: req.body.pwd,
+                    pwd: bcryptjs.hashSync(req.body.pwd, salt),
                     cart: []
                 });
                 req.session.userId = req.body.email;
-                return res.redirect('/')
+                return res.redirect('/login')
             }
             res.redirect('/register')
         } else {
