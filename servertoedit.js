@@ -76,7 +76,7 @@ const redirectLogin = (req, res, next) => {
 const redirectHome = (req, res, next) => {
     if (req.session.userId) {
         console.log('This redirects Home');
-        res.redirect('/')
+        res.redirect('/home')
     }else{
         next()
     }
@@ -136,7 +136,7 @@ app.get('/shop', redirectLogin, (request, response) => {
 //
 //Shop page end
 
-app.get('/', (req, res) => {
+app.get('/', redirectHome,(req, res) => {
     //const { userId} = req.session.userId
     if('userId' in req.session){
         res.render('home.hbs',{
