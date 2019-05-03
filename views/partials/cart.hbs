@@ -3,6 +3,8 @@
 {{# each products}}
     <div class="container">
         <div class="row">
+            {{message}}
+
             {{# each this}}
                 <div class="col">
                     <!--Card 1 -->
@@ -14,12 +16,11 @@
                                     <p class="card-text">Price: ${{price}}</p>
                                     <p class="card-text">Quantity: {{quantity}}</p>
                                     <form action="/delete-item" method="post">
-                                        Number to remove:<br>
-                                        <input id="remove_num" name="remove_num" type="text" value="0">
+                                        <label for="remove_num">Number to remove:</label><br>
+                                        <input id="remove_num" name="remove_num" type="number" min="0" value="0">
                                         <input type="submit" name="{{name}}" class="btn btn-primary" value="Remove">
                                         <input type="hidden" value="{{item_id}}" name="item_id">
                                     </form>
-
                                 </div>
                                 <div class="col-2 ml-auto">
                                     <img class="card-img-top ml-auto" src="{{path}}" alt="Card image cap">
