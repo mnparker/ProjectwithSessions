@@ -64,10 +64,10 @@ hbs.registerHelper('getCurrentYear', () => {
 app.set('view engine', 'hbs');
 app.use(express.static(__dirname + '/views'));
 
-const redirectLogin = (req, res, next) => {
+const redirectLogin = (req, response, next) => {
     if (!req.session.userId) {
         console.log('This redirects Login');
-        res.redirect('/')
+        response.redirect('/')
     }else{
         next()
     }
@@ -135,28 +135,23 @@ app.get('/shop', redirectLogin, (request, response) => {
 //
 //Shop page end
 
-app.get('/',(req, res) => {
-    //const { userId} = req.session.userId
+app.get('/',(req, response) => {
+    // const { userId} = req.session.userId;
     if('userId' in req.session){
-        res.redirect('/home')
+        response.redirect('/home')
         // res.render('home.hbs',{
         //     username: req.session.userId
         // })
     }else {
-        console.log(req.session);
-        res.render('homenotlog.hbs')
+        // console.log(req.session);
+        response.render('homenotlog.hbs')
     }
-
-    // res.render(`${userId ? `home.hbs` : `homenotlog.hbs`}`, {
-    //     username: req.session.userId
-    // })
-
 });
 
 
-app.get('/home', redirectLogin, (req, res) => {
-    // const { user } = res.locals;
-    res.render('home.hbs', {
+app.get('/home', redirectLogin, (req, response) => {
+    // const { user } = response.locals;
+    response.render('home.hbs', {
         username: req.session.userId
     })
 });
@@ -174,26 +169,26 @@ app.get('/home', redirectLogin, (req, res) => {
 //
 // });
 
-app.post('/login', redirectHome, (req, res) => {
+app.post('/login', redirectHome, (req, response) => {
     var db = utils.getDb();
     db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
         if (feedbacks.length === 0) {
-            res.redirect('/login')
+            response.redirect('/login');
         } else {
             if(bcryptjs.compareSync(req.body.pwd, feedbacks[0].pwd)) {
                 req.session.userId = feedbacks[0].email;
                 // console.log(`${req.session.userId} logged in`);
-                return res.redirect('/')
+                return response.redirect('/')
 
             }else{
-                res.redirect('/login')
+                response.redirect('/login');
             }
         }
     });
 });
 
 
-app.post('/register', redirectHome, (req, res) => {
+app.post('/register', redirectHome, (req, response) => {
     var db = utils.getDb();
     db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
         if (feedbacks.length === 0) {
@@ -211,24 +206,24 @@ app.post('/register', redirectHome, (req, res) => {
                     cart: []
                 });
                 req.session.userId = req.body.email;
-                return res.redirect('/login')
+                return response.redirect('/login')
             }
-            res.redirect('/register')
+            response.redirect('/register')
         } else {
-            res.redirect('/register')
+            response.redirect('/register')
         }
     })
 });
 
 
 
-app.get('/logout', redirectLogin, (req, res) => {
+app.get('/logout', redirectLogin, (req, response) => {
     req.session.destroy(err => {
         if (err) {
-            return res.redirect('/')
+            return response.redirect('/')
         }
-        res.clearCookie(SESS_NAME);
-        res.redirect('/')
+        response.clearCookie(SESS_NAME);
+        response.redirect('/')
     })
 });
 
@@ -329,3 +324,5 @@ app.listen(PORT, () => {
     console.log(`http://localhost:${PORT}`);
     utils.init();
 });
+
+module.exports = app;
