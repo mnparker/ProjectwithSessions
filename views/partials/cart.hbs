@@ -12,7 +12,9 @@
                                 <div class="col-10">
                                     <h5 class="card-title">{{name}}</h5>
                                     <p class="card-text">Price: ${{price}}</p>
+                                    <p class="card-text">Quantity: {{quantity}}</p>
                                     <form action="/delete-item" method="post">
+                                        <input type="number" id="remove_num" name="remove_num" value="0">
                                         <input type="submit" name="{{name}}" class="btn btn-primary" value="Remove">
                                         <input type="hidden" value="{{item_id}}" name="item_id">
                                     </form>
