@@ -317,7 +317,6 @@ app.post('/delete-item', redirectLogin, (request, response)=> {
         }
     });
     response.redirect('/my_cart')
-
 });
 
 app.listen(PORT, () => {
