@@ -257,25 +257,34 @@ app.post('/add-to-cart', redirectLogin,(request, response)=> {
                 error: "Cannot connect to database"
             })
         }else{
-            db.collection('Accounts').updateOne({"email": request.session.userId},
-                {
-                    $push: {
-                        "cart": {
-                            user_id: userID,
-                            item_id: doc._id,
-                            name: doc.name,
-                            path: doc.path,
-                            price: doc.price
-                        }
-                    }
-                });
-            // db.collection(`Cart_${userID}`).insertOne({
-            //     user_id: userID,
-            //     item_id: doc._id,
-            //     name: doc.name,
-            //     path: doc.path,
-            //     price: doc.price
-            // });
+            db.collection('Accounts').find({email: request.session.userId, "cart.item_id": doc._id}).toArray( (err, document)=>{
+                if (err){
+                    response.render('404.hbs',{
+                        error: "Cannot connect to database"
+                    })
+                }
+                if (document.length === 0){
+                    db.collection('Accounts').updateOne({"email": request.session.userId},
+                        {
+                            $push: {
+                                "cart": {
+                                    item_id: doc._id,
+                                    name: doc.name,
+                                    path: doc.path,
+                                    price: doc.price,
+                                    quantity: 1
+                                }
+                            }
+                        });
+                }else if(document.length === 1){
+                    db.collection('Accounts').updateOne({"email": request.session.userId, "cart.item_id": doc._id},
+                        {
+                            $inc: {
+                                "cart.$.quantity": 1
+                            }
+                        })
+                }
+            });
             response.redirect('/shop')}
     })
 
@@ -283,19 +292,36 @@ app.post('/add-to-cart', redirectLogin,(request, response)=> {
 
 app.post('/delete-item', redirectLogin, (request, response)=> {
     var cart_item_id = request.body.item_id;
+    var number = Number(request.body.remove_num);
     var db = utils.getDb();
-    db.collection('Accounts').update(
-        {"email": request.session.userId},
-        { $pull: {cart: {item_id: ObjectId(cart_item_id)}} }
-    );
+    db.collection('Accounts').findOne({email: request.session.userId, "cart.item_id": ObjectId(cart_item_id)}, (err, document)=>{
+        if (err){
+            response.render('404.hbs',{
+                error: "Cannot connect to database"
+            })
+        }
+        var cart_string = JSON.stringify(document.cart, undefined, indent=4);
+        var cart = JSON.parse(cart_string);
 
-    // db.collection(`Cart_${request.session.userId}`).deleteOne({_id: ObjectId(cart_item_id)}, (err,response)=> {
-    //     if (err){
-    //         response.render('404.hbs',{
-    //             error: "Database error"
-    //         })
-    //     }
-    // });
+        //Loops through account cart for the right product id
+        for (var i = 0; i < cart.length; i++){
+
+            if (cart[i].item_id === cart_item_id){
+                // If quantity is lower than or equal to 0, pull the product from the cart array
+                if (cart[i].quantity - number <= 0){
+                    db.collection('Accounts').findOneAndUpdate({email: request.session.userId},
+                        { $pull: {cart: {item_id: ObjectId(cart_item_id)}} }
+                    )
+                }else{
+                    db.collection('Accounts').findOneAndUpdate({email: request.session.userId, "cart.item_id": ObjectId(cart_item_id)},{
+                        $inc: {
+                            "cart.$.quantity": -`${number}`
+                        }
+                    });
+                }
+            }
+        }
+    });
     response.redirect('/my_cart')
 });
 
