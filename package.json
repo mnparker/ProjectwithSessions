@@ -14,7 +14,6 @@
     "body-parser": "^1.18.3",
     "chai": "^4.2.0",
     "chai-http": "^2.0.1",
-    "cloudinary": "^1.14.0",
     "connect-mongodb-session": "^2.1.1",
     "cookie-parser": "^1.4.4",
     "express": "^4.16.4",

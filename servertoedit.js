@@ -64,10 +64,10 @@ hbs.registerHelper('getCurrentYear', () => {
 app.set('view engine', 'hbs');
 app.use(express.static(__dirname + '/views'));
 
-const redirectLogin = (req, response, next) => {
+const redirectLogin = (req, res, next) => {
     if (!req.session.userId) {
         console.log('This redirects Login');
-        response.redirect('/')
+        res.redirect('/')
     }else{
         next()
     }
@@ -109,6 +109,7 @@ app.get('/my_cart', redirectLogin, (request, response) => {
 
 
 app.get('/shop', redirectLogin, (request, response) => {
+    console.log(request.session);
     var db = utils.getDb();
     db.collection('Shoes').find({}).toArray((err, docs) => {
         if (err) {
@@ -135,60 +136,65 @@ app.get('/shop', redirectLogin, (request, response) => {
 //
 //Shop page end
 
-app.get('/',(req, response) => {
-    // const { userId} = req.session.userId;
+app.get('/',(req, res) => {
+    //const { userId} = req.session.userId
     if('userId' in req.session){
-        response.redirect('/home')
+        res.redirect('/home')
         // res.render('home.hbs',{
         //     username: req.session.userId
         // })
     }else {
-        // console.log(req.session);
-        response.render('homenotlog.hbs')
+        console.log(req.session);
+        res.render('homenotlog.hbs')
     }
+
+    // res.render(`${userId ? `home.hbs` : `homenotlog.hbs`}`, {
+    //     username: req.session.userId
+    // })
+
 });
 
 
-app.get('/home', redirectLogin, (req, response) => {
-    // const { user } = response.locals;
-    response.render('home.hbs', {
+app.get('/home', redirectLogin, (req, res) => {
+    // const { user } = res.locals;
+    res.render('home.hbs', {
         username: req.session.userId
     })
 });
 
-// app.get('/login', redirectHome, (req, res) => {
-//     console.log(req.session);
-//     res.redirect('/');
-//     res.render('login_modal.hbs')
-//
-// });
-//
-// app.get('/register', redirectHome, (req, res) => {
-//     res.redirect('/');
-//     res.render('sign_up_modal.hbs')
-//
-// });
+app.get('/login', redirectHome, (req, res) => {
+    console.log(req.session);
+    res.redirect('/');
+    res.render('login_modal.hbs')
 
-app.post('/login', redirectHome, (req, response) => {
+});
+
+app.get('/register', redirectHome, (req, res) => {
+    res.redirect('/');
+    res.render('sign_up_modal.hbs')
+
+});
+
+app.post('/login', redirectHome, (req, res) => {
     var db = utils.getDb();
     db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
         if (feedbacks.length === 0) {
-            response.redirect('/login');
+            res.redirect('/login')
         } else {
             if(bcryptjs.compareSync(req.body.pwd, feedbacks[0].pwd)) {
                 req.session.userId = feedbacks[0].email;
-                // console.log(`${req.session.userId} logged in`);
-                return response.redirect('/')
+                console.log(`${req.session.userId} logged in`);
+                return res.redirect('/')
 
             }else{
-                response.redirect('/login');
+                res.redirect('/login')
             }
         }
     });
 });
 
 
-app.post('/register', redirectHome, (req, response) => {
+app.post('/register', redirectHome, (req, res) => {
     var db = utils.getDb();
     db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
         if (feedbacks.length === 0) {
@@ -206,24 +212,24 @@ app.post('/register', redirectHome, (req, response) => {
                     cart: []
                 });
                 req.session.userId = req.body.email;
-                return response.redirect('/login')
+                return res.redirect('/login')
             }
-            response.redirect('/register')
+            res.redirect('/register')
         } else {
-            response.redirect('/register')
+            res.redirect('/register')
         }
     })
 });
 
 
 
-app.get('/logout', redirectLogin, (req, response) => {
+app.get('/logout', redirectLogin, (req, res) => {
     req.session.destroy(err => {
         if (err) {
-            return response.redirect('/')
+            return res.redirect('/')
         }
-        response.clearCookie(SESS_NAME);
-        response.redirect('/')
+        res.clearCookie(SESS_NAME);
+        res.redirect('/')
     })
 });
 
@@ -323,5 +329,3 @@ app.listen(PORT, () => {
     console.log(`http://localhost:${PORT}`);
     utils.init();
 });
-
-module.exports = app;
