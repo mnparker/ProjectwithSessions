@@ -109,7 +109,7 @@ app.get('/my_cart', redirectLogin, (request, response) => {
 
 
 app.get('/shop', redirectLogin, (request, response) => {
-    console.log(request.session);
+    // console.log(request.session);
     var db = utils.getDb();
     db.collection('Shoes').find({}).toArray((err, docs) => {
         if (err) {
@@ -144,7 +144,7 @@ app.get('/',(req, res) => {
         //     username: req.session.userId
         // })
     }else {
-        console.log(req.session);
+        // console.log(req.session);
         res.render('homenotlog.hbs')
     }
 
@@ -162,32 +162,38 @@ app.get('/home', redirectLogin, (req, res) => {
     })
 });
 
-app.get('/login', redirectHome, (req, res) => {
-    console.log(req.session);
-    res.redirect('/');
-    res.render('login_modal.hbs')
-
-});
-
-app.get('/register', redirectHome, (req, res) => {
-    res.redirect('/');
-    res.render('sign_up_modal.hbs')
-
-});
+// app.get('/login', redirectHome, (req, res) => {
+//     console.log(req.session);
+//     res.redirect('/');
+//     res.render('login_modal.hbs')
+//
+// });
+//
+// app.get('/register', redirectHome, (req, res) => {
+//     res.redirect('/');
+//     res.render('sign_up_modal.hbs')
+//
+// });
 
 app.post('/login', redirectHome, (req, res) => {
     var db = utils.getDb();
     db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
         if (feedbacks.length === 0) {
-            res.redirect('/login')
+            res.render('homenotlog.hbs', {
+                login_message: "Account does not exist"
+            })
         } else {
             if(bcryptjs.compareSync(req.body.pwd, feedbacks[0].pwd)) {
                 req.session.userId = feedbacks[0].email;
-                console.log(`${req.session.userId} logged in`);
-                return res.redirect('/')
+                // console.log(`${req.session.userId} logged in`);
+                return res.redirect('/home')
 
             }else{
-                res.redirect('/login')
+                res.status(302);
+                res.render('homenotlog.hbs', {
+                    error: true,
+                    login_message: "Password does not match"
+                })
             }
         }
     });
@@ -212,7 +218,7 @@ app.post('/register', redirectHome, (req, res) => {
                     cart: []
                 });
                 req.session.userId = req.body.email;
-                return res.redirect('/login')
+                return res.redirect('/home')
             }
             res.redirect('/register')
         } else {
