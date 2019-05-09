@@ -181,23 +181,12 @@ app.get('/home', redirectLogin, (req, res) => {
     })
 });
 
-app.get('/login', redirectHome, (req, res) => {
-    //console.log(req.session);
-    res.redirect('/');
-    //res.render('login_modal.hbs')
-
-});
-
-app.get('/register', redirectHome, (req, res) => {
-    res.redirect('/');
-    //res.render('sign_up_modal.hbs')
-
-});
 
 app.post('/login', redirectHome, (req, res) => {
     var db = utils.getDb();
     db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
         if (feedbacks.length === 0) {
+
             res.render('homenotlog.hbs', {
                 error: true,
                 login_message: "Account does not exist"
@@ -213,6 +202,7 @@ app.post('/login', redirectHome, (req, res) => {
                     error: true,
                     login_message: "Password does not match"
                 })
+
             }
         }
     });
@@ -237,13 +227,13 @@ app.post('/register', redirectHome, (req, res) => {
                     cart: []
                 });
                 req.session.userId = req.body.email;
-                return res.redirect('/login')
+                return res.redirect('/home')
             }
-            //res.redirect('/register')
-			//WRONG PASSWORD
-			dt.callOut();
+
+            res.redirect('/')
+
         } else {
-            res.redirect('/register')
+            res.redirect('/')
         }
     })
 });
