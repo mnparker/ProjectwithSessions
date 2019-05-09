@@ -23,6 +23,7 @@ var $ = jQuery = require('jquery')(window);
 
 
 
+
 app.use(expressValidator());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
