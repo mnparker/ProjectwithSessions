@@ -3,12 +3,25 @@ const express = require('express');
 const session = require('express-session');
 const hbs = require('hbs');
 const bodyParser = require('body-parser');
+const dt = require('./scripts/scripts.js');
 const fs = require('fs');
 const bcryptjs = require('bcryptjs');
 const expressValidator = require('express-validator');
 var ObjectId = require('mongodb').ObjectID;
 const MongoDBStore = require('connect-mongodb-session')(session);
 var app = express();
+
+
+var jsdom = require('jsdom');
+const { JSDOM } = jsdom;
+const { window } = new JSDOM();
+const { document } = (new JSDOM('')).window;
+global.document = document;
+
+var $ = jQuery = require('jquery')(window);
+
+
+
 
 app.use(expressValidator());
 app.use(bodyParser.json());
@@ -109,7 +122,7 @@ app.get('/my_cart', redirectLogin, (request, response) => {
 
 
 app.get('/shop', redirectLogin, (request, response) => {
-    console.log(request.session);
+    //console.log(request.session);
     var db = utils.getDb();
     db.collection('Shoes').find({}).toArray((err, docs) => {
         if (err) {
@@ -121,10 +134,16 @@ app.get('/shop', redirectLogin, (request, response) => {
         }else {
             var productChunks = [];
             var chunkSize = 3;
+			var passedError = request.query.valid;
             for (var i = 0; i < docs.length; i+= chunkSize) {
                 productChunks.push(docs.slice(i, i + chunkSize));
             }
+			console.log(productChunks)
+			var itemname = docs['name'];
             response.render('shop.hbs', {
+								
+				itemerror: false,
+				item_message: 'Item added to cart.',
                 products: productChunks,
                 username: request.session.userId
             })
@@ -163,15 +182,15 @@ app.get('/home', redirectLogin, (req, res) => {
 });
 
 app.get('/login', redirectHome, (req, res) => {
-    console.log(req.session);
+    //console.log(req.session);
     res.redirect('/');
-    res.render('login_modal.hbs')
+    //res.render('login_modal.hbs')
 
 });
 
 app.get('/register', redirectHome, (req, res) => {
     res.redirect('/');
-    res.render('sign_up_modal.hbs')
+    //res.render('sign_up_modal.hbs')
 
 });
 
@@ -179,15 +198,21 @@ app.post('/login', redirectHome, (req, res) => {
     var db = utils.getDb();
     db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
         if (feedbacks.length === 0) {
-            res.redirect('/login')
+            res.render('homenotlog.hbs', {
+                error: true,
+                login_message: "Account does not exist"
+            })
         } else {
             if(bcryptjs.compareSync(req.body.pwd, feedbacks[0].pwd)) {
                 req.session.userId = feedbacks[0].email;
-                console.log(`${req.session.userId} logged in`);
-                return res.redirect('/')
+                // console.log(`${req.session.userId} logged in`);
+                return res.redirect('/home')
 
             }else{
-                res.redirect('/login')
+                res.render('homenotlog.hbs', {
+                    error: true,
+                    login_message: "Password does not match"
+                })
             }
         }
     });
@@ -214,7 +239,9 @@ app.post('/register', redirectHome, (req, res) => {
                 req.session.userId = req.body.email;
                 return res.redirect('/login')
             }
-            res.redirect('/register')
+            //res.redirect('/register')
+			//WRONG PASSWORD
+			dt.callOut();
         } else {
             res.redirect('/register')
         }
@@ -275,7 +302,11 @@ app.post('/add-to-cart', redirectLogin,(request, response)=> {
                                     quantity: 1
                                 }
                             }
+							
                         });
+						//NEW ITEM ADDED
+							console.log('Unique Item added to cart')
+						
                 }else if(document.length === 1){
                     db.collection('Accounts').updateOne({"email": request.session.userId, "cart.item_id": doc._id},
                         {
@@ -283,9 +314,12 @@ app.post('/add-to-cart', redirectLogin,(request, response)=> {
                                 "cart.$.quantity": 1
                             }
                         })
+						//SAME ITEM ADDED AGAIN
+						console.log('Item added to cart')
+						
                 }
             });
-            response.redirect('/shop')}
+          response.redirect('/shop')}
     })
 
 });

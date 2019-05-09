@@ -1,12 +1,12 @@
-
+<div class="container">
 {{# each products}}
-    <div class="container">
+	<div class="cartcontainer">
     <div class="row">
         {{# each this}}
             <div class="col">
                 <!--Card 1 -->
-                <div class="card mt-5 bg-light" style="width: 18rem;">
-                        <input type="image" class="card-img-top" src="{{path}}" alt="{{id}}" width="200" height="200">
+                <div class="card bg-light">
+                        <input type="image" class="card-img-top" src="{{path}}" alt="{{id}}" onclick="itemadded()">
                     <div class="card-body">
                     </div>
                     <ul class="list-group list-group-flush">
@@ -15,18 +15,18 @@
                         <li class="list-group-item" id="color">Color: {{color}}</li>
                         <li class="list-group-item" id="price">Price: ${{price}}</li>
                     </ul>
-                    <div class="card-body">
-                        <form action="/add-to-cart" method="post">
-                            <input type="submit" value="Add to cart" class="btn btn-primary">
-                        <input type="hidden" value="{{_id}}" name="objectid">
-                        </form>
-                    </div>
+                    
+					<form action="/add-to-cart" method="post">
+						<input type="submit" value="Add to cart" class="btn btn-primary" onclick="itemadded()">
+					<input type="hidden" value="{{_id}}" name="objectid">
+					</form>
+                   
                 </div>
                 <!--Card 1 end-->
-            </div>
+		</div>
         {{/each}}
     </div>
-    </div>
+	</div>
 {{/each}}
-
+    </div>
 
