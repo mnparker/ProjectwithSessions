@@ -94,11 +94,16 @@ app.get('/my_cart', redirectLogin, (request, response) => {
             })
         }
         var cart_list = [];
+        var total = 0;
+        for (var i = 0; i < docs[0].cart.length; i+=1){
+            total = total + (docs[0].cart[i].price * docs[0].cart[i].quantity)
+        }
         for (var i = 0; i < docs[0].cart.length; i+= 1) {
             cart_list.push(docs[0].cart.slice(i, i + 1));
         }
         response.render('my_cart.hbs',{
             products: cart_list,
+            total_price: total,
             username: request.session.userId
         })
     });
@@ -138,15 +143,15 @@ app.get('/shop', redirectLogin, (request, response) => {
 
 app.get('/',(req, res) => {
     //const { userId} = req.session.userId
-    if('userId' in req.session){
-        res.redirect('/home')
-        // res.render('home.hbs',{
-        //     username: req.session.userId
-        // })
-    }else {
-        // console.log(req.session);
-        res.render('homenotlog.hbs')
-    }
+        if('userId' in req.session){
+            res.redirect('/home')
+            // res.render('home.hbs',{
+            //     username: req.session.userId
+            // })
+        }else {
+            // console.log(req.session);
+            res.render('homenotlog.hbs')
+        }
 
     // res.render(`${userId ? `home.hbs` : `homenotlog.hbs`}`, {
     //     username: req.session.userId
@@ -179,7 +184,9 @@ app.post('/login', redirectHome, (req, res) => {
     var db = utils.getDb();
     db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
         if (feedbacks.length === 0) {
+            res.location('/');
             res.render('homenotlog.hbs', {
+                error: true,
                 login_message: "Account does not exist"
             })
         } else {
@@ -189,10 +196,9 @@ app.post('/login', redirectHome, (req, res) => {
                 return res.redirect('/home')
 
             }else{
-                res.status(302);
                 res.render('homenotlog.hbs', {
                     error: true,
-                    login_message: "Password does not match"
+                    login_message: "Account does not exist"
                 })
             }
         }
@@ -215,7 +221,8 @@ app.post('/register', redirectHome, (req, res) => {
                 db.collection('Accounts').insertOne({
                     email: req.body.email,
                     pwd: bcryptjs.hashSync(req.body.pwd, salt),
-                    cart: []
+                    cart: [],
+                    history: []
                 });
                 req.session.userId = req.body.email;
                 return res.redirect('/home')
@@ -330,6 +337,27 @@ app.post('/delete-item', redirectLogin, (request, response)=> {
     });
     response.redirect('/my_cart')
 });
+
+app.post('/checkout', (req,res)=>{
+    var today = new Date();
+    var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+    var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    var dateTime = date+' '+time;
+    var db = utils.getDb();
+    db.collection('Accounts').findOne({email: req.session.userId}, (err, document)=>{
+
+        var history = {};
+        history['date'] = dateTime;
+        history['items'] = document.cart;
+        db.collection('Accounts').findOneAndUpdate({email: req.session.userId},
+            {
+                $push: {history: history}
+            });
+        db.collection('Accounts').findOneAndUpdate({email: req.session.userId},
+            { $set: {cart: []}})
+    });
+    res.redirect('/my_cart')
+    });
 
 app.listen(PORT, () => {
     console.log(`http://localhost:${PORT}`);
