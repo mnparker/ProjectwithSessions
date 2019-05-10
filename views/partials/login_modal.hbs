@@ -13,8 +13,9 @@
         <form action="/login" method="post" id="loginForm">
             <label>E-mail:</label><br> <input id="email" name="email" type="email" size="20" required><br>
             <label>Password:</label><br> <input id="pwd" name="pwd" type="password" size="20" required><br>
-
-			<br>
+            <br>
+            {{login_message}}
+            <br>
             <a href="/register">Don't have an account yet?</a>
             <div class="modal-footer">
 			<div class='container'>
@@ -24,8 +25,6 @@
                 <input value="Login" type="submit" form="loginForm" class="btn btn-primary">
             </div>
         </form>
-
-        
     </div>
       </div>
       <!--<div class="modal-footer">-->

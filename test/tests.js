@@ -1,4 +1,4 @@
-const server = require('supertest').agent("https://glacial-retreat-42071.herokuapp.com");
+const server = require('supertest').agent("http://localhost:8080");
 const assert = require('chai').assert;
 const MongoClient = require('mongodb').MongoClient;
 
@@ -48,7 +48,6 @@ const checkcart = () => {
 };
 
 
-
 describe('server.js', function () {
     it('/ endpoint should render homepage', function (done) {
         server
@@ -62,19 +61,27 @@ describe('server.js', function () {
     });
     it('/register should give you a sessionID', function (done) {
         body = {};
+<<<<<<< HEAD
         body.email = "T3STER1@AJZSHOE.COM";
         body.pwd = 'Asdf12345';
         body.pwd2 = 'Asdf12345';
+=======
+        body.email = "ahmad123wqe"+String((Math.random()*100000)+1)+"1@nikko2.com";
+        body.pwd = 'Asdf12345!@#';
+        body.pwd2 = 'Asdf12345!@#';
+>>>>>>> 083accea824d2b73c76676e469f7a9b345b633b4
         server
             .post('/register')
             .send(body)
             .expect(200)
             .end((err, res) => {
+                console.log(res.header);
                 assert.equal(res.status, 302);
                 console.log(res.header);
                 let sess = res.header["set-cookie"] !== undefined;
                 assert.equal(sess, true);
                 done();
+
             });
     });
     it("/logout should clear the cookie", (done) => {
@@ -106,6 +113,7 @@ describe('server.js', function () {
                 assert.equal(res.status, 302);
                 console.log(res.headers);
                 let sess = res.headers["location"] === '/home';
+
                 assert.equal(sess, true);
                 done();
             });
@@ -197,8 +205,12 @@ describe('server.js', function () {
         });
 
     });
+<<<<<<< HEAD
 
 
 
 });
 
+=======
+});
+>>>>>>> 083accea824d2b73c76676e469f7a9b345b633b4

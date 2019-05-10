@@ -149,7 +149,11 @@ app.get('/shop', redirectLogin, (request, response) => {
                     admin: result.isAdmin,
                     products: productChunks,
                     username: request.session.userId
+<<<<<<< HEAD
                 })
+=======
+                    })
+>>>>>>> 083accea824d2b73c76676e469f7a9b345b633b4
                 // }
 
             });
@@ -162,6 +166,7 @@ app.get('/shop', redirectLogin, (request, response) => {
 
 app.get('/',(req, res) => {
     //const { userId} = req.session.userId
+<<<<<<< HEAD
     if('userId' in req.session){
         res.redirect('/home')
         // res.render('home.hbs',{
@@ -171,6 +176,17 @@ app.get('/',(req, res) => {
         // console.log(req.session);
         res.render('homenotlog.hbs')
     }
+=======
+        if('userId' in req.session){
+            res.redirect('/home')
+            // res.render('home.hbs',{
+            //     username: req.session.userId
+            // })
+        }else {
+            // console.log(req.session);
+            res.render('homenotlog.hbs')
+        }
+>>>>>>> 083accea824d2b73c76676e469f7a9b345b633b4
 
     // res.render(`${userId ? `home.hbs` : `homenotlog.hbs`}`, {
     //     username: req.session.userId

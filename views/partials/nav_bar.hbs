@@ -14,21 +14,22 @@
                         {{username}}
                     </a>
                     <!--Drop down items-->
-                        <div class="dropdown-menu dropdown-menu-right " aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="/logout">Logout</a>
-                        </div>
+                    <div class="dropdown-menu dropdown-menu-right " aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/logout">Logout</a>
+                    </div>
                     <!--Drop down items end-->
                 </li>
             {{else}}
                 <a data-toggle="modal" class="nav-item nav-link " href="#loginModal">Log In</a>
                 <a data-toggle="modal" class="nav-item nav-link " href="#exampleModal">Sign Up</a>
-				
+                <a data-toggle="modal" class="nav-item nav-link" href="#adminModal">Admin Sign Up</a>
+
             {{/if}}
         </div>
     </div>
 </nav>
 
-
+{{>admin_sign_up_modal}}
 {{>sign_up_modal}}
 {{>login_modal}}
 
