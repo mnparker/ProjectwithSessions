@@ -78,21 +78,4 @@ describe('server.js', function () {
                 done();
             })
     });
-
-    //admin page test
-    // it('/admin should have status 200', (done)=>{
-    //     body = {};
-    //     body.email = "admin@admin.com";
-    //     body.pwd = "Asdf123!@#";
-    //     server
-    //         .post('/login')
-    //         .send(body);
-    //     server
-    //         .get('/admin')
-    //         .expect(200)
-    //         .end((err,res) => {
-    //             assert.equal(res.status, 200);
-    //             done();
-    //         })
-    // })
 });

@@ -130,12 +130,6 @@ app.get('/shop', redirectLogin, (request, response) => {
                 productChunks.push(docs.slice(i, i + chunkSize));
             }
             db.collection("Accounts").findOne({email: request.session.userId}, (err, result) => {
-                // if (result.isAdmin){
-                //     response.render('admin_shop.hbs', {
-                //         products: productChunks,
-                //         username: request.session.userId
-                //     })
-                // }else{
                 response.render('shop.hbs',{
                     admin: result.isAdmin,
                     products: productChunks,

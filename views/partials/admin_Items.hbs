@@ -10,9 +10,9 @@
                         <input type="image" class="card-img-top" src="{{this.path}}" alt="{{this.name}}" width="300" height="300">
                         <div class="card-body">
                         </div>
-                        <ul class="list-group list-group-flush">
+                        <form id="{{this._id}}" class="form" action="/updateProduct/{{this._id}}" method="post">
                             <label for="path">Path:</label>
-                            <input class="form-control" id="path" name="path" value="{{this.path}}">
+                            <input class="form-control" id="image" name="image" value="{{this.path}}">
 
                             <label for="type">Type:</label>
                             <input class="form-control" id="type" name="type" value="{{this.type}}">
@@ -25,37 +25,15 @@
 
                             <label for="price">Price:</label>
                             <input class="form-control" id="price" name="price" value="{{this.price}}">
-                        </ul>
+                        </form>
                         <div class="card-body d-flex justify-content-center">
                                 <form method="post" action="/deleteProduct/{{this._id}}" style="margin-left: 5px; margin-right: 5px;">
                                     <button type="submit" class="btn btn-outline-danger">Remove</button>
                                 </form>
-                                <button type="submit" class="btn btn-outline-success" form="{{this._id}}">Update</button>
+                            <button type="submit" class="btn btn-outline-success" form="{{this._id}}">Update</button>
+                            <!--<input type="hidden" id="{{this._id}} name={{this._id}}">-->
                         </div>
                     </div>
-                    <!--Card 1 end-->
-
-                    <!--Card 1 -->
-                    <!--<div class="card mt-5 bg-light" style="width: 18rem; margin: 5%;">-->
-                        <!--<img src="{{this.path}}" alt="{{this.name}}" height="300" width="300">-->
-
-                        <!--<div class="card-body">-->
-                        <!--</div>-->
-                    <!--<form id="{{this._id}}" class="form" action="/updateProduct/{{this._id}}" method="post">-->
-                    <!--<input class="form-control" name="image" value="{{this.path}}">-->
-                    <!--<input class="form-control" name="type" value="{{this.type}}">-->
-                    <!--<input class="form-control" name="name" value="{{this.name}}">-->
-                    <!--<input class="form-control" name="color" value="{{this.color}}">-->
-                    <!--<input class="form-control" name="price" value="{{this.price}}">-->
-                    <!--</form>-->
-                    <!--<div class="card-body d-flex justify-content-center">-->
-                    <!--<form method="post" action="/deleteProduct/{{this._id}}" style="margin-left: 5px; margin-right: 5px;">-->
-                    <!--<button type="submit" class="btn btn-outline-danger">Remove</button>-->
-                    <!--</form>-->
-                    <!--<button type="submit" class="btn btn-outline-success" form="{{this._id}}">Update</button>-->
-                    <!--</div>-->
-                    <!--</div>-->
-                    <!--Card 1 end-->
                 </div>
             {{/each}}
         </div>
