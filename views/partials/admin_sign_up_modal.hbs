@@ -12,6 +12,7 @@
                     <div id="verifeye">
                         <input type="password" placeholder="Admin Verification Code" id="adminPass">
                         <button class="btn btn-outline-info" id="verifyButton">Verify</button>
+                        {{>adminalert}}
                     </div>
                     <div id="sign_in" class="d-none">
                         <form action="/registerAdmin" method="post" id="signupForm2">
@@ -20,13 +21,11 @@
                             <label>Enter Password Again:</label><br> <input id="pwd2" name="pwd2" type="password" size="20" required><br>
                             <br>
                         </form>
-
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <button type="submit" form="signupForm2" class="btn btn-primary">Create Account</button>
-                    {{>adminalert}}
                 </div>
             </div>
         </div>
