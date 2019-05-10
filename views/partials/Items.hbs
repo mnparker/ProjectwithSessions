@@ -3,6 +3,7 @@
 {{# each products}}
     <div class="card-deck">
         {{# each this}}
+
 		<!--Card -->
             <div class="card">
 				<input type="image" form="additem" class="card-img-top" src="{{path}}" alt="{{id}}" onclick="itemadded()">
@@ -23,6 +24,7 @@
 			</div>
 		 <!--Card end-->
 		 
+
         {{/each}}
 	</div>
 {{/each}}
