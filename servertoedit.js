@@ -134,7 +134,8 @@ app.get('/shop', redirectLogin, (request, response) => {
                     admin: result.isAdmin,
                     products: productChunks,
                     username: request.session.userId
-                    })
+                })
+
             });
         }
 
@@ -146,15 +147,15 @@ app.get('/shop', redirectLogin, (request, response) => {
 
 app.get('/',(req, res) => {
     //const { userId} = req.session.userId
-        if('userId' in req.session){
-            res.redirect('/home')
-            // res.render('home.hbs',{
-            //     username: req.session.userId
-            // })
-        }else {
-            // console.log(req.session);
-            res.render('homenotlog.hbs')
-        }
+    if('userId' in req.session){
+        res.redirect('/home')
+        // res.render('home.hbs',{
+        //     username: req.session.userId
+        // })
+    }else {
+        // console.log(req.session);
+        res.render('homenotlog.hbs')
+    }
 
     // res.render(`${userId ? `home.hbs` : `homenotlog.hbs`}`, {
     //     username: req.session.userId
@@ -216,10 +217,17 @@ app.post('/register', redirectHome, (req, res) => {
                 });
                 req.session.userId = req.body.email;
                 return res.redirect('/home')
+            }else{
+             res.render('homenotlog.hbs',{
+                 signup_error: true,
+                 signup_message : "Passwords do not match"
+             })
             }
-            res.redirect('/')
         } else {
-            res.redirect('/')
+            res.render('homenotlog.hbs',{
+                signup_error: true,
+                signup_message : "Account name already exists"
+            })
         }
     })
 });
@@ -384,10 +392,17 @@ app.post('/registerAdmin', (req, res) => {
                 });
                 req.session.userId = req.body.email;
                 return res.redirect('/home')
+            }else{
+                res.render('homenotlog.hbs',{
+                    admin_error: true,
+                    admin_message : "Passwords do not match"
+                })
             }
-            res.redirect('/')
         } else {
-            res.redirect('/')
+            res.render('homenotlog.hbs',{
+                admin_error: true,
+                admin_message : "Passwords do not match"
+            })
         }
     })
 });
