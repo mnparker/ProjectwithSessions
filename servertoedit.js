@@ -135,8 +135,6 @@ app.get('/shop', redirectLogin, (request, response) => {
                     products: productChunks,
                     username: request.session.userId
                     })
-                // }
-
             });
         }
 
@@ -219,9 +217,9 @@ app.post('/register', redirectHome, (req, res) => {
                 req.session.userId = req.body.email;
                 return res.redirect('/home')
             }
-            res.redirect('/register')
+            res.redirect('/')
         } else {
-            res.redirect('/register')
+            res.redirect('/')
         }
     })
 });
