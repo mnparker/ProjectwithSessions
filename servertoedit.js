@@ -3,12 +3,26 @@ const express = require('express');
 const session = require('express-session');
 const hbs = require('hbs');
 const bodyParser = require('body-parser');
+const dt = require('./scripts/scripts.js');
 const fs = require('fs');
 const bcryptjs = require('bcryptjs');
 const expressValidator = require('express-validator');
 var ObjectId = require('mongodb').ObjectID;
 const MongoDBStore = require('connect-mongodb-session')(session);
 var app = express();
+
+
+var jsdom = require('jsdom');
+const { JSDOM } = jsdom;
+const { window } = new JSDOM();
+const { document } = (new JSDOM('')).window;
+global.document = document;
+
+var $ = jQuery = require('jquery')(window);
+
+
+
+
 
 app.use(expressValidator());
 app.use(bodyParser.json());
@@ -114,7 +128,6 @@ app.get('/my_cart', redirectLogin, (request, response) => {
 
 
 app.get('/shop', redirectLogin, (request, response) => {
-
     var db = utils.getDb();
     db.collection('Shoes').find({}).toArray((err, docs) => {
         if (err) {
@@ -126,20 +139,25 @@ app.get('/shop', redirectLogin, (request, response) => {
         }else {
             var productChunks = [];
             var chunkSize = 3;
+            var passedError = request.query.valid;
             for (var i = 0; i < docs.length; i+= chunkSize) {
                 productChunks.push(docs.slice(i, i + chunkSize));
             }
+
             db.collection("Accounts").findOne({email: request.session.userId}, (err, result) => {
                 response.render('shop.hbs',{
                     admin: result.isAdmin,
                     products: productChunks,
                     username: request.session.userId
+<<<<<<< HEAD
+                })
+=======
                     })
+>>>>>>> 083accea824d2b73c76676e469f7a9b345b633b4
                 // }
 
             });
         }
-
     });
 });
 
@@ -148,6 +166,17 @@ app.get('/shop', redirectLogin, (request, response) => {
 
 app.get('/',(req, res) => {
     //const { userId} = req.session.userId
+<<<<<<< HEAD
+    if('userId' in req.session){
+        res.redirect('/home')
+        // res.render('home.hbs',{
+        //     username: req.session.userId
+        // })
+    }else {
+        // console.log(req.session);
+        res.render('homenotlog.hbs')
+    }
+=======
         if('userId' in req.session){
             res.redirect('/home')
             // res.render('home.hbs',{
@@ -157,6 +186,7 @@ app.get('/',(req, res) => {
             // console.log(req.session);
             res.render('homenotlog.hbs')
         }
+>>>>>>> 083accea824d2b73c76676e469f7a9b345b633b4
 
     // res.render(`${userId ? `home.hbs` : `homenotlog.hbs`}`, {
     //     username: req.session.userId
@@ -219,9 +249,11 @@ app.post('/register', redirectHome, (req, res) => {
                 req.session.userId = req.body.email;
                 return res.redirect('/home')
             }
-            res.redirect('/register')
+
+            res.redirect('/')
+
         } else {
-            res.redirect('/register')
+            res.redirect('/')
         }
     })
 });
@@ -280,7 +312,11 @@ app.post('/add-to-cart', redirectLogin,(request, response)=> {
                                     quantity: 1
                                 }
                             }
+
                         });
+                    //NEW ITEM ADDED
+                    console.log('Unique Item added to cart')
+
                 }else if(document.length === 1){
                     db.collection('Accounts').updateOne({"email": request.session.userId, "cart.item_id": doc._id},
                         {
@@ -288,6 +324,9 @@ app.post('/add-to-cart', redirectLogin,(request, response)=> {
                                 "cart.$.quantity": 1
                             }
                         })
+                    //SAME ITEM ADDED AGAIN
+                    console.log('Item added to cart')
+
                 }
             });
             response.redirect('/shop')}
