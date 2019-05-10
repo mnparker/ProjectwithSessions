@@ -135,7 +135,6 @@ app.get('/shop', redirectLogin, (request, response) => {
                     products: productChunks,
                     username: request.session.userId
                 })
-                // }
 
             });
         }
@@ -218,10 +217,17 @@ app.post('/register', redirectHome, (req, res) => {
                 });
                 req.session.userId = req.body.email;
                 return res.redirect('/home')
+            }else{
+             res.render('homenotlog.hbs',{
+                 signup_error: true,
+                 signup_message : "Passwords do not match"
+             })
             }
-            res.redirect('/')
         } else {
-            res.redirect('/')
+            res.render('homenotlog.hbs',{
+                signup_error: true,
+                signup_message : "Account name already exists"
+            })
         }
     })
 });
@@ -386,10 +392,17 @@ app.post('/registerAdmin', (req, res) => {
                 });
                 req.session.userId = req.body.email;
                 return res.redirect('/home')
+            }else{
+                res.render('homenotlog.hbs',{
+                    admin_error: true,
+                    admin_message : "Passwords do not match"
+                })
             }
-            res.redirect('/')
         } else {
-            res.redirect('/')
+            res.render('homenotlog.hbs',{
+                admin_error: true,
+                admin_message : "Passwords do not match"
+            })
         }
     })
 });
