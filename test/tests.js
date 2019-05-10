@@ -61,15 +61,20 @@ describe('server.js', function () {
     });
     it('/register should give you a sessionID', function (done) {
         body = {};
-<<<<<<< HEAD
+    <<<<<<<
+        HEAD
         body.email = "T3STER1@AJZSHOE.COM";
         body.pwd = 'Asdf12345';
         body.pwd2 = 'Asdf12345';
-=======
-        body.email = "ahmad123wqe"+String((Math.random()*100000)+1)+"1@nikko2.com";
+    ======
+        =
+            body.email = "ahmad123wqe" + String((Math.random() * 100000) + 1) + "1@nikko2.com";
         body.pwd = 'Asdf12345!@#';
         body.pwd2 = 'Asdf12345!@#';
->>>>>>> 083accea824d2b73c76676e469f7a9b345b633b4
+    >>>>>>>
+        0
+        83
+        accea824d2b73c76676e469f7a9b345b633b4
         server
             .post('/register')
             .send(body)
@@ -90,7 +95,7 @@ describe('server.js', function () {
             .expect(200)
             .end((err, res) => {
                 assert.equal(res.status, 302);
-                try{
+                try {
                     let sess = res.headers["set-cookie"][0].includes('sid=;');
                     assert.equal(sess, true);
                 }
@@ -119,7 +124,7 @@ describe('server.js', function () {
             });
     });
 
-    it('/shop should have status 200', (done)=>{
+    it('/shop should have status 200', (done) => {
         body = {};
         body.email = "T3STER1@AJZSHOE.COM";
         body.pwd = "Asdf12345";
@@ -132,12 +137,12 @@ describe('server.js', function () {
                 server
                     .get('/shop')
                     .expect(302)
-                    .end((err,res1) => {
+                    .end((err, res1) => {
                         assert.equal(res1.status, 200);
                         // console.log(res1.res.text);
-                        if (res1.res.text.includes('Add to cart')){
+                        if (res1.res.text.includes('Add to cart')) {
                             sess = 1
-                        }else {
+                        } else {
                             sess = 0
                         }
                         assert.equal(sess, 1);
@@ -146,7 +151,7 @@ describe('server.js', function () {
             })
 
     });
-    it('adding to cart /shop should have status 200',(done)=>{
+    it('adding to cart /shop should have status 200', (done) => {
         body = {};
         body.email = "T3STER1@AJZSHOE.COM";
         body.pwd = "Asdf12345";
@@ -160,7 +165,7 @@ describe('server.js', function () {
                 server
                     .get('/shop')
                     .expect(302)
-                    .end((err,res1) => {
+                    .end((err, res1) => {
                         console.log(body);
                         server
                             .post('/add-to-cart')
@@ -168,7 +173,7 @@ describe('server.js', function () {
                             .expect(200)
                             .end((err, res2) => {
                                 checkcart()
-                                assert.equal(true,true);
+                                assert.equal(true, true);
                                 done()
 
                             });
@@ -178,7 +183,7 @@ describe('server.js', function () {
 
     });
 
-    it('/my_cart should have status 200', (done)=>{
+    it('/my_cart should have status 200', (done) => {
         body = {};
         body.email = "T3STER1@AJZSHOE.COM";
         body.pwd = "Asdf12345";
@@ -186,31 +191,23 @@ describe('server.js', function () {
             .post('/login')
             .send(body)
             .expect(200)
-            .end((err, res)=> {
+            .end((err, res) => {
                 server
                     .get('/my_cart')
                     .expect(302)
-                    .end((err,res1) => {
+                    .end((err, res1) => {
                         assert.equal(res.status, 302);
                         assert.equal(res1.req.path, '/my_cart');
-                        if (res1.res.text.includes('My Cart')){
+                        if (res1.res.text.includes('My Cart')) {
                             sess = 1
-                        }else {
+                        } else {
                             sess = 0
                         }
                         assert.equal(sess, 1);
                         teardown();
                         done();
                     });
-        });
+            });
 
     });
-<<<<<<< HEAD
-
-
-
 });
-
-=======
-});
->>>>>>> 083accea824d2b73c76676e469f7a9b345b633b4
