@@ -61,15 +61,9 @@ describe('server.js', function () {
     });
     it('/register should give you a sessionID', function (done) {
         body = {};
-<<<<<<< HEAD
-        body.email = "T3STER1@AJZSHOE.COM";
-        body.pwd = 'Asdf12345';
-        body.pwd2 = 'Asdf12345';
-=======
         body.email = "ahmad123wqe"+String((Math.random()*100000)+1)+"1@nikko2.com";
         body.pwd = 'Asdf12345!@#';
         body.pwd2 = 'Asdf12345!@#';
->>>>>>> 083accea824d2b73c76676e469f7a9b345b633b4
         server
             .post('/register')
             .send(body)
@@ -205,12 +199,4 @@ describe('server.js', function () {
         });
 
     });
-<<<<<<< HEAD
-
-
-
 });
-
-=======
-});
->>>>>>> 083accea824d2b73c76676e469f7a9b345b633b4
