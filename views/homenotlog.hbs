@@ -10,6 +10,7 @@
 <body>
 {{>nav_bar}}
 
+	
     <img src="images/Logo.PNG" class="rounded mx-auto d-block" alt="logo">
 
     <!--Jumbo-->
@@ -43,6 +44,14 @@
             $(function() {
                 $('#loginModal').modal('show');
 				$('#loginalert').css('display', 'inline-block');
+
+            });
+        }
+
+		if ({{singup_error}}){
+            $(function() {
+                $('#exampleModal').modal('show');
+				$('#signupalert').css('display', 'inline-block');
 
             });
         }
