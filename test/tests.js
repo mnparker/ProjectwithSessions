@@ -1,7 +1,6 @@
 const server = require('supertest').agent("http://localhost:8080");
 const assert = require('chai').assert;
 
-
 describe('server.js', function () {
     it('/ endpoint should render homepage', function (done) {
         server

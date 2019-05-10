@@ -13,17 +13,10 @@
     <div class="wrapper text-center">
         <!--{{message}}-->
         <br>
-        {{#if admin}}
-            <a data-toggle="modal" class="btn btn-primary" href="#addModal">Add Product</a>
-            {{>admin_Items}}
-            {{> addProduct}}
-        {{else}}
-            <div class="container-fluid justify-content-center row">
-                {{> Items}}
-            </div>
-        {{/if}}
-
-
+        <div class="container-fluid justify-content-center row">
+            {{> admin_Items}}
+        </div>
+        {{> addProduct}}
         <br>
     </div>
 <br>
