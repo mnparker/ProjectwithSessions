@@ -219,7 +219,12 @@ app.post('/login', redirectHome, (req, res) => {
 });
 
 
-app.post('/register', redirectHome, (req, res) => {     var db = utils.getDb();     db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {         if (feedbacks.length === 0) {             if(req.body.pwd === req.body.pwd2) {                 delete req.body._id; // for safety reasons 
+app.post('/register', redirectHome, (req, res) => {  
+	var db = utils.getDb();     
+	db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) { 
+	if (feedbacks.length === 0) {            
+	if(req.body.pwd === req.body.pwd2) {                
+	delete req.body._id; // for safety reasons 
                 let salt = undefined;                 bcryptjs.genSalt(10, (err, result) => {                     if (err)                         console.log(err);                     salt = result;                 });                 db.collection('Accounts').insertOne({                     email: req.body.email,                     pwd: bcryptjs.hashSync(req.body.pwd, salt),                     cart: [],                     history: []                 });                 req.session.userId = req.body.email;                 return res.redirect('/home')             }else{              res.render('homenotlog.hbs',{                  signup_error: true,                  signup_message : "Passwords do not match"              })             }         } else {             res.render('homenotlog.hbs',{                 signup_error: true,                 signup_message : "Account name already exists"             })                 }     }) });
 
 
