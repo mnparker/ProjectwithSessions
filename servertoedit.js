@@ -181,12 +181,23 @@ app.get('/home', redirectLogin, (req, res) => {
     })
 });
 
+app.get('/login', redirectHome, (req, res) => {
+    //console.log(req.session);
+    res.redirect('/');
+    //res.render('login_modal.hbs')
+
+});
+
+app.get('/register', redirectHome, (req, res) => {
+    res.redirect('/');
+    //res.render('sign_up_modal.hbs')
+
+});
 
 app.post('/login', redirectHome, (req, res) => {
     var db = utils.getDb();
     db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
         if (feedbacks.length === 0) {
-
             res.render('homenotlog.hbs', {
                 error: true,
                 login_message: "Account does not exist"
@@ -202,14 +213,12 @@ app.post('/login', redirectHome, (req, res) => {
                     error: true,
                     login_message: "Password does not match"
                 })
-
             }
         }
     });
 });
 
 
-<<<<<<< HEAD
 app.post('/register', redirectHome, (req, res) => {  
 	var db = utils.getDb();     
 	db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) { 
@@ -217,36 +226,6 @@ app.post('/register', redirectHome, (req, res) => {
 	if(req.body.pwd === req.body.pwd2) {                
 	delete req.body._id; // for safety reasons 
                 let salt = undefined;                 bcryptjs.genSalt(10, (err, result) => {                     if (err)                         console.log(err);                     salt = result;                 });                 db.collection('Accounts').insertOne({                     email: req.body.email,                     pwd: bcryptjs.hashSync(req.body.pwd, salt),                     cart: [],                     history: []                 });                 req.session.userId = req.body.email;                 return res.redirect('/home')             }else{              res.render('homenotlog.hbs',{                  signup_error: true,                  signup_message : "Passwords do not match"              })             }         } else {             res.render('homenotlog.hbs',{                 signup_error: true,                 signup_message : "Account name already exists"             })                 }     }) });
-=======
-app.post('/register', redirectHome, (req, res) => {
-    var db = utils.getDb();
-    db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
-        if (feedbacks.length === 0) {
-            if(req.body.pwd === req.body.pwd2) {
-                delete req.body._id; // for safety reasons
-                let salt = undefined;
-                bcryptjs.genSalt(10, (err, result) => {
-                    if (err)
-                        console.log(err);
-                    salt = result;
-                });
-                db.collection('Accounts').insertOne({
-                    email: req.body.email,
-                    pwd: bcryptjs.hashSync(req.body.pwd, salt),
-                    cart: []
-                });
-                req.session.userId = req.body.email;
-                return res.redirect('/home')
-            }
-
-            res.redirect('/')
-
-        } else {
-            res.redirect('/')
-        }
-    })
-});
->>>>>>> fa0376351f2bfbc055128dfa9318539c4117eb36
 
 
 
