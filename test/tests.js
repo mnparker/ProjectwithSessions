@@ -40,7 +40,7 @@ const checkcart = () => {
                 throw(err);
             }
             else {
-                console.log(data)
+                assert.equal(data, 1)
             }
 
         });
@@ -159,7 +159,6 @@ describe('server.js', function () {
                             .expect(200)
                             .end((err, res2) => {
                                 checkcart()
-                                assert.equal(true,true);
                                 done()
 
                             });
