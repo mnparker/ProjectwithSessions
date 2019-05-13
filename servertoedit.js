@@ -138,6 +138,7 @@ app.get('/shop', redirectLogin, (request, response) => {
                 products: productChunks,
                 username: request.session.userId
             });
+
             db.collection("Accounts").findOne({email: request.session.userId}, (err, result) => {
                 response.render('shop.hbs',{
                     admin: result.isAdmin,
