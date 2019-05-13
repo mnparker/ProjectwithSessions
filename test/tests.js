@@ -1,53 +1,6 @@
 const server = require('supertest').agent("https://glacial-retreat-42071.herokuapp.com");
 const assert = require('chai').assert;
-const MongoClient = require('mongodb').MongoClient;
-
-const teardown = () => {
-    MongoClient.connect('mongodb+srv://admin:mongodb@agileproject-qha9t.mongodb.net/projectdb?retryWrites=true',function(err,client) {
-        const db = client.db('projectdb');
-        if (err) {
-            console.log(err);
-        }
-        else {
-            console.log("Connected to db");
-
-
-            db.collection('Accounts').remove({email: "T3STER1@AJZSHOE.COM"}, function (err, data) {
-
-                if (err) {
-                    throw(err);
-                }
-                else {
-                    console.log("sucessfuly inserted");
-                }
-
-            })
-        }
-        client.close();
-    })
-};
-
-const cartData = [];
-
-const checkcart = () => {
-    MongoClient.connect('mongodb+srv://admin:mongodb@agileproject-qha9t.mongodb.net/projectdb?retryWrites=true',function(err,client) {
-        const db = client.db('projectdb');
-
-
-        db.collection('Accounts').findOne({email: "T3STER1@AJZSHOE.COM"}, function (err, data) {
-
-            if (err) {
-                throw(err);
-            }
-            else {
-                assert.equal(data, 1)
-            }
-
-        });
-    });
-};
-
-
+const mock = require('../test/mock_data.js');
 describe('server.js', function () {
     it('/ endpoint should render homepage', function (done) {
         server
@@ -70,7 +23,6 @@ describe('server.js', function () {
             .expect(200)
             .end((err, res) => {
                 assert.equal(res.status, 302);
-                console.log(res.header);
                 let sess = res.header["set-cookie"] !== undefined;
                 assert.equal(sess, true);
                 done();
@@ -103,7 +55,6 @@ describe('server.js', function () {
             .expect(200)
             .end((err, res) => {
                 assert.equal(res.status, 302);
-                console.log(res.headers);
                 let sess = res.headers["location"] === '/home';
                 assert.equal(sess, true);
                 done();
@@ -119,13 +70,11 @@ describe('server.js', function () {
             .send(body)
             .expect(200)
             .end((err, res) => {
-                console.log(res.headers);
                 server
                     .get('/shop')
                     .expect(302)
                     .end((err,res1) => {
                         assert.equal(res1.status, 200);
-                        // console.log(res1.res.text);
                         if (res1.res.text.includes('Add to cart')){
                             sess = 1
                         }else {
@@ -138,31 +87,53 @@ describe('server.js', function () {
 
     });
     it('adding to cart /shop should have status 200',(done)=>{
+        this.timeout(5000);
         body = {};
         body.email = "T3STER1@AJZSHOE.COM";
         body.pwd = "Asdf12345";
-        body.objectid = '5cd498219157e30cdc7ecaab';
+        body.objectid = '5cd4fb1e1c9d4400008b3f0b';
         server
             .post('/login')
             .send(body)
             .expect(200)
             .end((err, res) => {
-                // console.log(res.headers);
                 server
                     .get('/shop')
                     .expect(302)
                     .end((err,res1) => {
-                        console.log(body);
                         server
                             .post('/add-to-cart')
                             .send(body)
                             .expect(200)
                             .end((err, res2) => {
-                                checkcart()
-                                done()
-
+                                done();
                             });
+                    })
+            })
 
+    });
+    it('check add to cart /shop should have status 200',(done)=>{
+        body = {};
+        body.email = "T3STER1@AJZSHOE.COM";
+        body.pwd = "Asdf12345";
+        body.objectid = '5cd4fb1e1c9d4400008b3f0b';
+        server
+            .post('/login')
+            .send(body)
+            .expect(200)
+            .end((err, res) => {
+                server
+                    .get('/shop')
+                    .expect(302)
+                    .end((err,res1) => {
+                        server
+                            .post('/add-to-cart')
+                            .send(body)
+                            .expect(200)
+                            .end((err, res2) => {
+                                mock.checkcart();
+                                done();
+                            });
                     })
             })
 
@@ -189,7 +160,7 @@ describe('server.js', function () {
                             sess = 0
                         }
                         assert.equal(sess, 1);
-                        teardown();
+                        mock.teardown();
                         done();
                     });
             });
