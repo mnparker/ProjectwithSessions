@@ -129,6 +129,24 @@ app.get('/shop', redirectLogin, (request, response) => {
             for (var i = 0; i < docs.length; i+= chunkSize) {
                 productChunks.push(docs.slice(i, i + chunkSize));
             }
+			console.log(productChunks)
+			var itemname = docs['name'];
+            response.render('shop.hbs', {
+					
+	
+				itemerror: false,
+                products: productChunks,
+                username: request.session.userId
+            
+            db.collection("Accounts").findOne({email: request.session.userId}, (err, result) => {
+                response.render('shop.hbs',{
+                    admin: result.isAdmin,
+                    products: productChunks,
+                    username: request.session.userId
+                })
+
+            })
+<<<<<<< HEAD
             db.collection("Accounts").findOne({email: request.session.userId}, (err, result) => {
                 response.render('shop.hbs',{
                     admin: result.isAdmin,
@@ -137,6 +155,8 @@ app.get('/shop', redirectLogin, (request, response) => {
                 })
 
             });
+=======
+>>>>>>> ac5d9baeb446d6f11412f31cf119f85d0933866d
         }
 
     });
@@ -171,10 +191,27 @@ app.get('/home', redirectLogin, (req, res) => {
     })
 });
 
+
+app.get('/login', redirectHome, (req, res) => {
+    //console.log(req.session);
+    res.redirect('/');
+    //res.render('login_modal.hbs')
+
+});
+
+app.get('/register', redirectHome, (req, res) => {
+    res.redirect('/');
+    //res.render('sign_up_modal.hbs')
+
+});
+
+
+
 app.post('/login', redirectHome, (req, res) => {
     var db = utils.getDb();
     db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
         if (feedbacks.length === 0) {
+
             res.location('/');
             res.render('homenotlog.hbs', {
                 error: true,
@@ -195,6 +232,7 @@ app.post('/login', redirectHome, (req, res) => {
         }
     });
 });
+
 
 
 app.post('/register', redirectHome, (req, res) => {

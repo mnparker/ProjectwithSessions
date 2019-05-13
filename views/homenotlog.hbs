@@ -10,6 +10,7 @@
 <body>
 {{>nav_bar}}
 
+	
     <img src="images/Logo.PNG" class="rounded mx-auto d-block" alt="logo">
 
     <!--Jumbo-->
@@ -56,6 +57,20 @@
             });
         }
     </script>
+	<script>
+	if ({{signup_error}}){
+            $(function() {
+                $('#exampleModal').modal('show');
+				$('#signupalert').css('display', 'inline-block');
+
+<<<<<<< HEAD
+=======
+
+>>>>>>> ac5d9baeb446d6f11412f31cf119f85d0933866d
+            });
+        }
+	
+</script>
 
     <script>
         if ({{admin_error}}){
@@ -65,6 +80,7 @@
         });
         }
     </script>
+
     <!--Scripts-->
 </body>
 </html>
