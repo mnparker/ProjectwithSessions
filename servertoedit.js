@@ -383,14 +383,6 @@ app.post("/addProduct", (req, res) => {
     });
 });
 
-app.get("/db", (req, res) => {
-
-    utils.getDb().collection("Shoes").find().toArray((err, result) => {
-        console.log(result)
-    });
-    res.redirect("/")
-});
-
 app.post('/registerAdmin', (req, res) => {
 
     var db = utils.getDb();
@@ -454,13 +446,6 @@ app.post("/addProduct", (req, res) => {
     });
 });
 
-app.get("/db", (req, res) => {
-
-    utils.getDb().collection("Shoes").find().toArray((err, result) => {
-        console.log(result)
-    });
-    res.redirect("/")
-});
 
 app.post("/updateProduct/:id", (req, res) => {
     let db = utils.getDb();
