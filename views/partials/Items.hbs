@@ -1,9 +1,10 @@
 
-<div class="center">
-{{# each products}}
-    <div class="card-deck">
-        {{# each this}}
 
+{{# each products}}
+    <div class="container center">
+		<div class="row">
+        {{# each this}}
+			<div class="col">
 		<!--Card -->
             <div class="card">
 				<input type="image" form="additem" class="card-img-top" src="{{path}}" alt="{{id}}" onclick="itemadded()">
@@ -23,11 +24,12 @@
 					</div>
 			</div>
 		 <!--Card end-->
-
+		</div>
         {{/each}}
+		</div>
 	</div>
 {{/each}}
-</div>
+
 	
 	
 	
