@@ -136,7 +136,7 @@ app.get('/shop', redirectLogin, (request, response) => {
 	
 				itemerror: false,
                 products: productChunks,
-                username: request.session.userId
+			username: request.session.userId })
             
             db.collection("Accounts").findOne({email: request.session.userId}, (err, result) => {
                 response.render('shop.hbs',{
@@ -146,17 +146,7 @@ app.get('/shop', redirectLogin, (request, response) => {
                 })
 
             })
-<<<<<<< HEAD
-            db.collection("Accounts").findOne({email: request.session.userId}, (err, result) => {
-                response.render('shop.hbs',{
-                    admin: result.isAdmin,
-                    products: productChunks,
-                    username: request.session.userId
-                })
 
-            });
-=======
->>>>>>> ac5d9baeb446d6f11412f31cf119f85d0933866d
         }
 
     });
