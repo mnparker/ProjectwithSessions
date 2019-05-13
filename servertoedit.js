@@ -129,15 +129,16 @@ app.get('/shop', redirectLogin, (request, response) => {
             for (var i = 0; i < docs.length; i+= chunkSize) {
                 productChunks.push(docs.slice(i, i + chunkSize));
             }
-			console.log(productChunks)
+			console.log(productChunks);
 			var itemname = docs['name'];
             response.render('shop.hbs', {
-					
-	
-				itemerror: false,
+
+
+                itemerror: false,
                 products: productChunks,
-			username: request.session.userId })
-            
+                username: request.session.userId
+            });
+
             db.collection("Accounts").findOne({email: request.session.userId}, (err, result) => {
                 response.render('shop.hbs',{
                     admin: result.isAdmin,
@@ -146,7 +147,6 @@ app.get('/shop', redirectLogin, (request, response) => {
                 })
 
             })
-
         }
 
     });
