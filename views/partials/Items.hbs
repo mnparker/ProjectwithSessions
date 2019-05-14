@@ -1,37 +1,32 @@
 
 
-{{# each products}}
-    <div class="container center">
+{{#each products}}
+    <div class="container">
 		<div class="row">
-        {{# each this}}
-
-			<div class="col">
-
-
-
-		<!--Card -->
-            <div class="card">
-				<input type="image" form="additem" class="card-img-top" src="{{path}}" alt="{{id}}" onclick="itemadded()">
-					<div class="card-body">
-						<ul class="list-group list-group-flush">
-							<li class="list-group-item" id="type">Type: {{type}}</li>
-							<li class="list-group-item" id="name">Name: {{name}}</li>
-							<li class="list-group-item" id="color">Color: {{color}}</li>
-							<li class="list-group-item" id="price">Price: ${{price}}</li>
-							<li class="list-group-item">
-							<form id="additem" action="/add-to-cart" method="post">
-								<input type="submit" value="Add to cart" class="btn btn-secondary" onclick="itemadded()">
-								<input type="hidden" value="{{_id}}" name="objectid">
-							</form>
-							</li>
-						</ul>
-					</div>
-			</div>
-		 <!--Card end-->
-
-		</div>
-
-        {{/each}}
+			{{# each this}}
+				<div class="col">
+					<!--Card -->
+					<div class="card">
+						<input type="image" form="additem" class="card-img-top" src="{{path}}" alt="{{id}}" onclick="itemadded()" onmouseover="highlight()">
+							<div class="card-body">
+								<ul class="list-group list-group-flush">
+									<li class="list-group-item" id="type">Type: {{type}}</li>
+									<li class="list-group-item" id="name">Name: {{name}}</li>
+									<li class="list-group-item" id="color">Color: {{color}}</li>
+									<li class="list-group-item" id="price">Price: ${{price}}</li>
+									
+									<li class="list-group-item">
+										<form id="additem" action="/add-to-cart" method="post">
+										<input type="submit" value="Add to cart" class="btn btn-secondary" onclick="itemadded()">
+										<input type="hidden" value="{{_id}}" name="objectid">
+										</form>
+									</li>
+								</ul>
+							</div>
+						</div>
+					<!--Card end-->
+				</div>
+			{{/each}}
 		</div>
 	</div>
 {{/each}}
