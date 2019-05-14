@@ -232,6 +232,7 @@ app.post('/register', redirectHome, (req, res) => {
                 db.collection('Accounts').insertOne({
                     email: req.body.email,
                     pwd: bcryptjs.hashSync(req.body.pwd, salt),
+                    isAdmin: false,
                     cart: [],
                     history: []
                 });
@@ -384,6 +385,7 @@ app.post("/addProduct", (req, res) => {
 });
 
 app.post('/registerAdmin', (req, res) => {
+    //potential issue if posted from postman will create admin account without authentication
 
     var db = utils.getDb();
     db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
