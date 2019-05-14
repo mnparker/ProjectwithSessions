@@ -28,6 +28,32 @@ const teardown = () => {
     })
 };
 
+const teardownadmin = () => {
+    MongoClient.connect('mongodb+srv://admin:mongodb@agileproject-qha9t.mongodb.net/projectdb?retryWrites=true',function(err,client) {
+        const db = client.db('projectdb');
+        if (err) {
+            console.log(err);
+        }
+        else {
+            console.log("Connected to db");
+
+
+            db.collection('Accounts').remove({email: "T3STER1@AJZSHOE.COM"}, function (err, data) {
+
+                if (err) {
+                    throw(err);
+                }
+                else {
+                    console.log("Test Ended Database cleared");
+                    client.close();
+                }
+
+            })
+        }
+
+    })
+};
+
 
 const checkcart = () => {
     MongoClient.connect('mongodb+srv://admin:mongodb@agileproject-qha9t.mongodb.net/projectdb?retryWrites=true',function(err,client) {
@@ -49,5 +75,6 @@ const checkcart = () => {
 
 module.exports = {
     checkcart,
-    teardown
+    teardown,
+    teardownadmin
 };
