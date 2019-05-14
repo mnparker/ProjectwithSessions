@@ -12,7 +12,6 @@ function closealert(){
 
 
 function itemadded(){
-	
 	var itemalert = document.getElementById('itemalert');
 	itemalert.style.display = 'inline-block';
 	
@@ -21,11 +20,65 @@ function itemadded(){
 
 
 function itemremoved() {
-
 	var itemalerts = document.getElementById('removealert')
 	itemalerts.style.display = 'inline-block';
 
+};
+
+//on mouseover highlight
+function highlight() {
+	var x = event.clientX;
+	var y = event.clientY;
+	
+	elementMouseIsOver = document.elementFromPoint(x, y);
+	elementMouseIsOver.style.border = 'solid';
+	
+	setTimeout(function() {
+   elementMouseIsOver.style.border = 'none';
+  }, 500);
+	
+	
 }
+
+
+function testhigh() {
+var x = event.clientX;
+	var y = event.clientY;
+	
+	let test = document.elementFromPoint(x, y);
+
+
+
+// Briefly make the list purple when the mouse moves off the
+// <ul> element
+test.addEventListener("mouseleave", function( event ) {   
+  // highlight the mouseleave target
+  event.target.border = "solid";
+
+  // reset the color after a short delay
+  setTimeout(function() {
+    event.target.style.color = "";
+  }, 500);
+}, false);
+
+// Briefly make an <li> orange when the mouse moves off of it
+test.addEventListener("mouseout", function( event ) {   
+  // highlight the mouseout target
+  event.target.style.color = "orange";
+
+  // reset the color after a short delay
+  setTimeout(function() {
+    event.target.style.color = "";
+  }, 500);
+}, false);
+
+
+
+}
+
+
+
+
 
 
 closealert();
