@@ -322,6 +322,7 @@ app.post('/add-to-cart', redirectLogin,(request, response)=> {
 
 });
 
+
 app.post('/delete-item', redirectLogin, (request, response)=> {
     var cart_item_id = request.body.item_id;
     var number = Number(request.body.remove_num);
