@@ -1,6 +1,7 @@
 const server = require('supertest').agent("https://glacial-retreat-42071.herokuapp.com");
 const assert = require('chai').assert;
 const mock = require('../test/mock_data.js');
+
 describe('server.js', function () {
     it('/ endpoint should render homepage', function (done) {
         server
@@ -8,6 +9,9 @@ describe('server.js', function () {
             .expect(200)
             .expect("Content-type", /html/)
             .end((err, res) => {
+                if (err){
+                    console.log(err)
+                }
                 assert.equal(res.status, 200);
                 done();
             });
@@ -22,6 +26,9 @@ describe('server.js', function () {
             .send(body)
             .expect(200)
             .end((err, res) => {
+                if (err){
+                    console.log(err)
+                }
                 assert.equal(res.status, 302);
                 let sess = res.header["set-cookie"] !== undefined;
                 assert.equal(sess, true);
@@ -33,6 +40,9 @@ describe('server.js', function () {
             .get('/logout')
             .expect(200)
             .end((err, res) => {
+                if (err){
+                    console.log(err)
+                }
                 assert.equal(res.status, 302);
                 try{
                     let sess = res.headers["set-cookie"][0].includes('sid=;');
@@ -54,6 +64,9 @@ describe('server.js', function () {
             .send(body)
             .expect(200)
             .end((err, res) => {
+                if (err){
+                    console.log(err)
+                }
                 assert.equal(res.status, 302);
                 let sess = res.headers["location"] === '/home';
                 assert.equal(sess, true);
@@ -70,10 +83,16 @@ describe('server.js', function () {
             .send(body)
             .expect(200)
             .end((err, res) => {
+                if (err){
+                    console.log(err)
+                }
                 server
                     .get('/shop')
                     .expect(302)
                     .end((err,res1) => {
+                        if (err){
+                            console.log(err)
+                        }
                         assert.equal(res1.status, 200);
                         if (res1.res.text.includes('Add to cart')){
                             sess = 1
@@ -97,15 +116,24 @@ describe('server.js', function () {
             .send(body)
             .expect(200)
             .end((err, res) => {
+                if (err){
+                    console.log(err)
+                }
                 server
                     .get('/shop')
                     .expect(302)
                     .end((err,res1) => {
+                        if (err){
+                            console.log(err)
+                        }
                         server
                             .post('/add-to-cart')
                             .send(body)
                             .expect(200)
                             .end((err, res2) => {
+                                if (err){
+                                    console.log(err)
+                                }
                                 done();
                             });
                     })
@@ -122,6 +150,9 @@ describe('server.js', function () {
             .send(body)
             .expect(200)
             .end((err, res) => {
+                if (err){
+                    console.log(err)
+                }
                 server
                     .get('/shop')
                     .expect(302)
@@ -131,6 +162,9 @@ describe('server.js', function () {
                             .send(body)
                             .expect(200)
                             .end((err, res2) => {
+                                if (err){
+                                    console.log(err)
+                                }
                                 mock.checkcart();
                                 done();
                             });
@@ -148,10 +182,16 @@ describe('server.js', function () {
             .send(body)
             .expect(200)
             .end((err, res)=> {
+                if (err){
+                    console.log(err)
+                }
                 server
                     .get('/my_cart')
                     .expect(302)
                     .end((err,res1) => {
+                        if (err){
+                            console.log(err)
+                        }
                         assert.equal(res.status, 302);
                         assert.equal(res1.req.path, '/my_cart');
                         if (res1.res.text.includes('My Cart')){
@@ -160,10 +200,37 @@ describe('server.js', function () {
                             sess = 0
                         }
                         assert.equal(sess, 1);
-                        mock.teardown();
                         done();
                     });
             });
 
     });
+    // it('/my_cart DELETE should have status 200', (done)=>{
+    //     body = {};
+    //     body.email = "T3STER1@AJZSHOE.COM";
+    //     body.pwd = "Asdf12345";
+    //     body.item_id = "5cd4fb1e1c9d4400008b3f0b";
+    //     server
+    //         .post('/login')
+    //         .send(body)
+    //         .expect(200)
+    //         .end((err, res)=> {
+    //             if (err){
+    //                 console.log(err)
+    //             }
+    //             server
+    //                 .post('/delete-item')
+    //                 .expect(302)
+    //                 .end((err,res1) => {
+    //                     if (err){
+    //                         console.log(err)
+    //                     }
+    //                     assert.equal(res.status, 302);
+    //                     mock.teardown();
+    //                     done()
+    //
+    //                 });
+    //         });
+    //
+    // }).timeout(5000)
 });
