@@ -6,7 +6,7 @@ describe('server.js', function () {
     console.log('tests_2 start');
     it('/registerAdmin should give you a sessionID', function (done) {
         body = {};
-        body.email = "T3STER1@AJZSHOE.COM";
+        body.email = "T3STER1ADMIN@AJZSHOE.COM";
         body.pwd = 'Asdf12345';
         body.pwd2 = 'Asdf12345';
         server
@@ -26,7 +26,7 @@ describe('server.js', function () {
 
     it('/admin shop status is 200', (done)=>{
         body = {};
-        body.email = "T3STER1@AJZSHOE.COM";
+        body.email = "T3STER1ADMIN@AJZSHOE.COM";
         body.pwd = 'Asdf12345';
         server
             .post('/login')
@@ -52,7 +52,7 @@ describe('server.js', function () {
 
     it('/admin Add product shop status is 200', (done)=>{
         body = {};
-        body.email = "T3STER1@AJZSHOE.COM";
+        body.email = "T3STER1ADMIN@AJZSHOE.COM";
         body.pwd = 'Asdf12345';
         body.name = 'JordanAdmintest';
         body.type = 'Black Shoe';
@@ -77,19 +77,40 @@ describe('server.js', function () {
                             .send(body)
                             .expect(302)
                             .end((error, response1) =>{
-                                server
-                                    .get('/shop')
-                                    .expect(200)
-                                    .end((error, response2) => {
-                                        compare = !!response.res.text.includes('JordanAdmintest');
-                                        assert.equal(compare, true);
-                                       done()
-                                    })
+                                done()
                             })
 
                     })
             })
-    }).timeout(5000)
+    }).timeout(5000);
+
+    it('/admin checks for added shoe', (done)=>{
+        body = {};
+        body.email = "T3STER1ADMIN@AJZSHOE.COM";
+        body.pwd = 'Asdf12345';
+        server
+            .post('/login')
+            .send(body)
+            .expect(302)
+            .end((err, res)=>{
+                if (err){
+                    console.log(err)
+                }
+                server
+                    .get('/shop')
+                    .expect(200)
+                    .end((error, response)=>{
+                        compare = !!response.res.text.includes('JordanAdmintest');
+                        // console.log(response.res.text)
+                        assert.equal(response.status, 200);
+                        assert.equal(compare, true);
+                        mock.teardownadmin();
+                        done()
+                    })
+            })
+    });
+
+
 
 
 });
