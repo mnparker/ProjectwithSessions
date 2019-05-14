@@ -16,6 +16,13 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
+
+//load the client stylesheet
+app.use(express.static('public'))
+
+
+
+
 var store = new MongoDBStore({
     uri: 'mongodb+srv://admin:mongodb@agileproject-qha9t.mongodb.net/projectdb?retryWrites=true',
     collection: 'mySessions'

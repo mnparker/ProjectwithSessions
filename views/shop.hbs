@@ -7,7 +7,7 @@
     {{>stylesheet}}
 
 </head>
-<body>
+<body onload="changeColor()">
 {{>nav_bar}}
 <br>
 <!--{{message}}-->
@@ -21,7 +21,7 @@
         <!--{{message}}-->
         <br>
         {{#if admin}}
-            <a data-toggle="modal" class="btn btn-primary" href="#addModal">Add Product</a>
+            <a data-toggle="modal" class="btn btn-primary-custom" href="#addModal">Add Product</a>
             {{>admin_Items}}
             {{> addProduct}}
         {{else}}

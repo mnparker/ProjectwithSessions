@@ -1,5 +1,5 @@
 <script>
-
+var colorMode = 'normal'
 
 //closes the alert
 function closealert(){
@@ -25,60 +25,64 @@ function itemremoved() {
 
 };
 
-//on mouseover highlight
-function highlight() {
-	var x = event.clientX;
-	var y = event.clientY;
+//change css
+function changeColor() {
+
+	//get the users saved value
+	//var colorMode = 'night';
+	var primaryButton = document.getElementsByClassName("btn-primary-custom");
+	var secondaryButton = document.getElementsByClassName("btn-secondary-custom");
+	var modals = document.getElementsByClassName("custommodal");
 	
-	elementMouseIsOver = document.elementFromPoint(x, y);
-	elementMouseIsOver.style.border = 'solid';
-	
-	setTimeout(function() {
-   elementMouseIsOver.style.border = 'none';
-  }, 500);
-	
-	
+	//change the css and/or colours
+	if (colorMode == 'night') {
+		document.body.style.backgroundColor = "#43464A";
+		
+		
+		//loops through and changes the properties for each element of array
+		//Primary Button
+		for (i = 0; i < primaryButton.length; i++){
+			primaryButton[i].style.backgroundColor = "black";
+			primaryButton[i].style.borderColor = "#00af89";
+			primaryButton[i].style.color = "blue";
+			}
+		//Secondary
+		for (i = 0; i < secondaryButton.length; i++){
+			secondaryButton[i].style.backgroundColor = "white";
+			secondaryButton[i].style.borderColor = "black";
+			}
+		
+		//Modals
+		for (i = 0; i < modals.length; i++){
+			modals[i].style.backgroundColor = "#43464A";
+			//modals[i].style.borderColor = "black";
+			}
+	}
+	//save the new value in the users session.
 }
 
 
-function testhigh() {
-var x = event.clientX;
-	var y = event.clientY;
+function setcolorMode() {
+
+	//get default colormode or users saved value in session
+	if(colorMode == 'normal'){
+		colorMode = 'night';
+		changeColor();
+		
+	}
 	
-	let test = document.elementFromPoint(x, y);
+	if(colorMode == 'night') {
+		colorMode = 'normal';
 
-
-
-// Briefly make the list purple when the mouse moves off the
-// <ul> element
-test.addEventListener("mouseleave", function( event ) {   
-  // highlight the mouseleave target
-  event.target.border = "solid";
-
-  // reset the color after a short delay
-  setTimeout(function() {
-    event.target.style.color = "";
-  }, 500);
-}, false);
-
-// Briefly make an <li> orange when the mouse moves off of it
-test.addEventListener("mouseout", function( event ) {   
-  // highlight the mouseout target
-  event.target.style.color = "orange";
-
-  // reset the color after a short delay
-  setTimeout(function() {
-    event.target.style.color = "";
-  }, 500);
-}, false);
-
+		
+		
+	}
+	
+	
+	
 
 
 }
-
-
-
-
 
 
 closealert();
