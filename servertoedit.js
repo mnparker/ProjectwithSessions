@@ -118,28 +118,20 @@ app.get('/shop', redirectLogin, (request, response) => {
     var db = utils.getDb();
     db.collection('Shoes').find({}).toArray((err, docs) => {
         if (err) {
-            response.render('404', { error: "Unable to connect to database" })
+            response.render('404.hbs', { error: "Unable to connect to database" })
         }
-
         if (!docs){
             throw err;
-        }else {
-            var productChunks = [];
-            var chunkSize = 3;
-            for (var i = 0; i < docs.length; i+= chunkSize) {
-                productChunks.push(docs.slice(i, i + chunkSize));
-            }
-			console.log(productChunks);
-			var itemname = docs['name'];
-            db.collection("Accounts").findOne({email: request.session.userId}, (err, result) => {
-                response.render('shop.hbs',{
-                    admin: result.isAdmin,
-                    products: productChunks,
-                    username: request.session.userId
-                })
-
-            })
         }
+        db.collection("Accounts").findOne({email: request.session.userId}, (err, result) => {
+            response.render('shop.hbs',{
+                itemerror: false,
+                admin: result.isAdmin,
+                products: docs,
+                username: request.session.userId
+            })
+
+        });
 
     });
 });
@@ -173,27 +165,10 @@ app.get('/home', redirectLogin, (req, res) => {
     })
 });
 
-
-app.get('/login', redirectHome, (req, res) => {
-    //console.log(req.session);
-    res.redirect('/');
-    //res.render('login_modal.hbs')
-
-});
-
-app.get('/register', redirectHome, (req, res) => {
-    res.redirect('/');
-    //res.render('sign_up_modal.hbs')
-
-});
-
-
-
 app.post('/login', redirectHome, (req, res) => {
     var db = utils.getDb();
     db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
         if (feedbacks.length === 0) {
-
             res.location('/');
             res.render('homenotlog.hbs', {
                 error: true,
@@ -216,7 +191,6 @@ app.post('/login', redirectHome, (req, res) => {
 });
 
 
-
 app.post('/register', redirectHome, (req, res) => {
     var db = utils.getDb();
     db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
@@ -232,17 +206,16 @@ app.post('/register', redirectHome, (req, res) => {
                 db.collection('Accounts').insertOne({
                     email: req.body.email,
                     pwd: bcryptjs.hashSync(req.body.pwd, salt),
-                    isAdmin: false,
                     cart: [],
                     history: []
                 });
                 req.session.userId = req.body.email;
                 return res.redirect('/home')
             }else{
-             res.render('homenotlog.hbs',{
-                 signup_error: true,
-                 signup_message : "Passwords do not match"
-             })
+                res.render('homenotlog.hbs',{
+                    signup_error: true,
+                    signup_message : "Passwords do not match"
+                })
             }
         } else {
             res.render('homenotlog.hbs',{
@@ -279,6 +252,7 @@ app.post('/add-to-cart', redirectLogin,(request, response)=> {
     var db = utils.getDb();
     var userID = request.session.userId;
     var productId = request.body.objectid;
+    let quantity = request.body.quantity || 1;
 
     db.collection('Shoes').findOne( { _id : ObjectId(productId) }, (err, doc) => {
         if (err) {
@@ -304,7 +278,7 @@ app.post('/add-to-cart', redirectLogin,(request, response)=> {
                                     name: doc.name,
                                     path: doc.path,
                                     price: doc.price,
-                                    quantity: 1
+                                    quantity: quantity
                                 }
                             }
                         });
@@ -312,14 +286,16 @@ app.post('/add-to-cart', redirectLogin,(request, response)=> {
                     db.collection('Accounts').updateOne({"email": request.session.userId, "cart.item_id": doc._id},
                         {
                             $inc: {
-                                "cart.$.quantity": 1
+                                "cart.$.quantity": quantity
                             }
                         })
                 }
             });
-            response.redirect('/shop')}
+            setTimeout(function () {
+                response.redirect('/shop')
+            }, 3000);
+        }
     })
-
 });
 
 app.post('/delete-item', redirectLogin, (request, response)=> {
@@ -353,8 +329,9 @@ app.post('/delete-item', redirectLogin, (request, response)=> {
                 }
             }
         }
+
+            response.redirect('/my_cart');
     });
-    response.redirect('/my_cart')
 });
 
 app.post("/addProduct", (req, res) => {
@@ -365,18 +342,22 @@ app.post("/addProduct", (req, res) => {
             let color = req.body.color;
             let price = req.body.price;
             let image = req.body.image;
+            let description = req.body.description;
             utils.getDb().collection("Shoes").insertOne(
                 {
                     name: name,
                     type: type,
                     color: color,
                     price: price,
-                    path: image
+                    path: image,
+                    description: description
                 }, function (err, result1) {
                     if (err)
                         console.log(err);
                     else
-                        res.redirect('/shop');
+                        setTimeout(function () {
+                            res.redirect("/shop");
+                        }, 2000);
                 });
 
         } else
@@ -384,8 +365,15 @@ app.post("/addProduct", (req, res) => {
     });
 });
 
+app.get("/db", (req, res) => {
+
+    utils.getDb().collection("Accounts").find().toArray((err, result) => {
+        console.log(result)
+    });
+    res.redirect("/")
+});
+
 app.post('/registerAdmin', (req, res) => {
-    //potential issue if posted from postman will create admin account without authentication
 
     var db = utils.getDb();
     db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
@@ -415,7 +403,7 @@ app.post('/registerAdmin', (req, res) => {
         } else {
             res.render('homenotlog.hbs',{
                 admin_error: true,
-                admin_message : "Passwords do not match"
+                admin_message : "Account already exists"
             })
         }
     })
@@ -429,13 +417,17 @@ app.post("/addProduct", (req, res) => {
             let color = req.body.color;
             let price = req.body.price;
             let image = req.body.image;
+            let description = req.body.description;
+
             utils.getDb().collection("Shoes").insertOne(
                 {
                     name: name,
                     type: type,
                     color: color,
                     price: price,
-                    path: image
+                    path: image,
+                    description: description
+
                 }, function (err, result1) {
                     if (err)
                         console.log(err);
@@ -448,6 +440,12 @@ app.post("/addProduct", (req, res) => {
     });
 });
 
+app.get("/db", (req, res) => {
+    utils.getDb().collection("Shoes").find().toArray((err, result) => {
+        console.log(result)
+    });
+    res.redirect("/")
+});
 
 app.post("/updateProduct/:id", (req, res) => {
     let db = utils.getDb();
@@ -457,7 +455,8 @@ app.post("/updateProduct/:id", (req, res) => {
             type: req.body.type,
             name: req.body.name,
             color: req.body.color,
-            price: req.body.price
+            price: req.body.price,
+            description: req.body.description
         }
     }, function (err, result) {
         if(err)
@@ -477,27 +476,54 @@ app.post('/deleteProduct/:id', (req, res) => {
     })
 });
 
-//Checkout method for week 3
-// app.post('/checkout', (req,res)=>{
-//     var today = new Date();
-//     var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-//     var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-//     var dateTime = date+' '+time;
-//     var db = utils.getDb();
-//     db.collection('Accounts').findOne({email: req.session.userId}, (err, document)=>{
-//
-//         var history = {};
-//         history['date'] = dateTime;
-//         history['items'] = document.cart;
-//         db.collection('Accounts').findOneAndUpdate({email: req.session.userId},
-//             {
-//                 $push: {history: history}
-//             });
-//         db.collection('Accounts').findOneAndUpdate({email: req.session.userId},
-//             { $set: {cart: []}})
-//     });
-//     res.redirect('/my_cart')
-//     });
+app.get("/product/:id", (req, res) => {
+    let db = utils.getDb();
+    db.collection('Shoes').findOne({_id: ObjectId(req.params.id)}, function (err, result) {
+        if(err)
+            console.log(err);
+        else{
+            db.collection('Accounts').findOne({email: req.session.userId}, function (err, result1) {
+                if(err)
+                    console.log(err);
+                else {
+                    res.render("productPage.hbs", {
+                        product: result,
+                        username: req.session.userId,
+                        admin: result1.isAdmin
+
+                    })
+                }
+            });
+        }
+    })
+});
+
+// Checkout method for week 3
+app.post('/checkout', (req,res)=>{
+    var today = new Date();
+    var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+    var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    var dateTime = date+' '+time;
+    var db = utils.getDb();
+    db.collection('Accounts').findOne({email: req.session.userId}, (err, document)=>{
+
+        var history = {};
+        history['date'] = dateTime;
+        history['items'] = document.cart;
+        db.collection('Accounts').findOneAndUpdate({email: req.session.userId},
+            {
+                $push: {history: history}
+            });
+        db.collection('Accounts').findOneAndUpdate({email: req.session.userId},
+            { $set: {cart: []}})
+    });
+    setTimeout(function () {
+        res.render('my_cart.hbs',{
+        purchase: true,
+        username: req.session.userId
+    })
+    }, 3000);
+});
 
 app.listen(PORT, () => {
     console.log(`http://localhost:${PORT}`);
