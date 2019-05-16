@@ -1,5 +1,5 @@
-// const server = require('supertest').agent("https://glacial-retreat-42071.herokuapp.com");
-const server = require('supertest').agent("http://localhost:8080");
+const server = require('supertest').agent("https://glacial-retreat-42071.herokuapp.com");
+// const server = require('supertest').agent("http://localhost:8080");
 const assert = require('chai').assert;
 const mock = require('../test/mock_data.js');
 
