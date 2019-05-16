@@ -1,5 +1,5 @@
-const server = require('supertest').agent("https://glacial-retreat-42071.herokuapp.com");
-// const server = require('supertest').agent("http://localhost:8080");
+// const server = require('supertest').agent("https://glacial-retreat-42071.herokuapp.com");
+const server = require('supertest').agent("http://localhost:8080");
 const assert = require('chai').assert;
 const mock = require('../test/mock_data.js');
 
@@ -17,7 +17,7 @@ describe('server.js', function () {
                 assert.equal(res.status, 200);
                 done();
             });
-    });
+    }).timeout(5000);
     it('/register should give you a sessionID', function (done) {
         body = {};
         body.email = "T3STER1@AJZSHOE.COM";
@@ -111,7 +111,7 @@ describe('server.js', function () {
         body = {};
         body.email = "T3STER1@AJZSHOE.COM";
         body.pwd = "Asdf12345";
-        body.objectid = '5cddd9e8d6c0070017b6080a';
+        body.objectid = "507f191e810c19729de860ea";
         server
             .post('/login')
             .send(body)
@@ -162,38 +162,6 @@ describe('server.js', function () {
                         }
                         assert.equal(res.status, 302);
                         assert.equal(res1.req.path, '/my_cart');
-                        if (res1.res.text.includes('Air Max')){
-                            sess = 1;
-                        }else {
-                            sess = 0
-                        }
-                        assert.equal(sess, 1);
-                        done();
-                    });
-            });
-
-    }).timeout(5000);
-    it('/my_cart should have status 200', (done)=>{
-        body = {};
-        body.email = "T3STER1@AJZSHOE.COM";
-        body.pwd = "Asdf12345";
-        server
-            .post('/login')
-            .send(body)
-            .expect(302)
-            .end((err, res)=> {
-                if (err){
-                    console.log(err)
-                }
-                server
-                    .get('/my_cart')
-                    .expect(200)
-                    .end((err,res1) => {
-                        if (err){
-                            console.log(err)
-                        }
-                        assert.equal(res.status, 302);
-                        assert.equal(res1.req.path, '/my_cart');
                         if (res1.res.text.includes('My Cart')){
                             sess = 1
                         }else {
@@ -210,7 +178,7 @@ describe('server.js', function () {
         body = {};
         body.email = "T3STER1@AJZSHOE.COM";
         body.pwd = "Asdf12345";
-        body.item_id = "5cddd9e8d6c0070017b6080a";
+        body.item_id = "507f191e810c19729de860ea";
         body.remove_num = "2";
         body.quantity = "1";
         server
@@ -264,7 +232,7 @@ describe('server.js', function () {
                         if (err){
                             console.log(err)
                         }
-                        if (res1.res.text.includes('Air Max')){
+                        if (res1.res.text.includes('YeezyTest')){
                             sess = 1
                         }else {
                             sess = 0
