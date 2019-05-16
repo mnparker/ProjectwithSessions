@@ -83,8 +83,27 @@ const checkcart = () => {
     });
 };
 
+const emptycheckcart = () => {
+    MongoClient.connect('mongodb+srv://admin:mongodb@agileproject-qha9t.mongodb.net/projectdb?retryWrites=true',function(err,client) {
+        const db = client.db('projectdb');
+
+
+        db.collection('Accounts').findOne({email: "T3STER1@AJZSHOE.COM"}, function (err, data) {
+
+            if (err) {
+                throw(err);
+            }
+            else {
+                assert.deepEqual(data.cart, []);
+                client.close()
+            }
+        });
+    });
+};
+
 module.exports = {
     checkcart,
     teardown,
-    teardownadmin
+    teardownadmin,
+    emptycheckcart
 };

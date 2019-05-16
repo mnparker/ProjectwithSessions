@@ -1,4 +1,5 @@
 const server = require('supertest').agent("https://glacial-retreat-42071.herokuapp.com");
+// const server = require('supertest').agent("http://localhost:8080");
 const assert = require('chai').assert;
 const mock = require('../test/mock_data.js');
 
@@ -24,7 +25,7 @@ describe('server.js', function () {
         server
             .post('/register')
             .send(body)
-            .expect(200)
+            .expect(302)
             .end((err, res) => {
                 if (err){
                     console.log(err)
@@ -38,7 +39,7 @@ describe('server.js', function () {
     it("/logout should clear the cookie", (done) => {
         server
             .get('/logout')
-            .expect(200)
+            .expect(302)
             .end((err, res) => {
                 if (err){
                     console.log(err)
@@ -62,7 +63,7 @@ describe('server.js', function () {
         server
             .post('/login')
             .send(body)
-            .expect(200)
+            .expect(302)
             .end((err, res) => {
                 if (err){
                     console.log(err)
@@ -81,14 +82,14 @@ describe('server.js', function () {
         server
             .post('/login')
             .send(body)
-            .expect(200)
+            .expect(302)
             .end((err, res) => {
                 if (err){
                     console.log(err)
                 }
                 server
                     .get('/shop')
-                    .expect(302)
+                    .expect(200)
                     .end((err,res1) => {
                         if (err){
                             console.log(err)
@@ -106,7 +107,6 @@ describe('server.js', function () {
 
     });
     it('adding to cart /shop should have status 200',(done)=>{
-        this.timeout(5000);
         body = {};
         body.email = "T3STER1@AJZSHOE.COM";
         body.pwd = "Asdf12345";
@@ -114,14 +114,14 @@ describe('server.js', function () {
         server
             .post('/login')
             .send(body)
-            .expect(200)
+            .expect(302)
             .end((err, res) => {
                 if (err){
                     console.log(err)
                 }
                 server
                     .get('/shop')
-                    .expect(302)
+                    .expect(200)
                     .end((err,res1) => {
                         if (err){
                             console.log(err)
@@ -129,7 +129,7 @@ describe('server.js', function () {
                         server
                             .post('/add-to-cart')
                             .send(body)
-                            .expect(200)
+                            .expect(302)
                             .end((err, res2) => {
                                 if (err){
                                     console.log(err)
@@ -139,40 +139,7 @@ describe('server.js', function () {
                     })
             })
 
-    });
-    it('check add to cart /shop should have status 200',(done)=>{
-        body = {};
-        body.email = "T3STER1@AJZSHOE.COM";
-        body.pwd = "Asdf12345";
-        body.objectid = '5cd4fb1e1c9d4400008b3f0b';
-        server
-            .post('/login')
-            .send(body)
-            .expect(200)
-            .end((err, res) => {
-                if (err){
-                    console.log(err)
-                }
-                server
-                    .get('/shop')
-                    .expect(302)
-                    .end((err,res1) => {
-                        server
-                            .post('/add-to-cart')
-                            .send(body)
-                            .expect(200)
-                            .end((err, res2) => {
-                                if (err){
-                                    console.log(err)
-                                }
-                                mock.checkcart();
-                                done();
-                            });
-                    })
-            })
-
-    });
-
+    }).timeout(5000);
     it('/my_cart should have status 200', (done)=>{
         body = {};
         body.email = "T3STER1@AJZSHOE.COM";
@@ -180,14 +147,46 @@ describe('server.js', function () {
         server
             .post('/login')
             .send(body)
-            .expect(200)
+            .expect(302)
             .end((err, res)=> {
                 if (err){
                     console.log(err)
                 }
                 server
                     .get('/my_cart')
-                    .expect(302)
+                    .expect(200)
+                    .end((err,res1) => {
+                        if (err){
+                            console.log(err)
+                        }
+                        assert.equal(res.status, 302);
+                        assert.equal(res1.req.path, '/my_cart');
+                        if (res1.res.text.includes('Air Max')){
+                            sess = 1;
+                        }else {
+                            sess = 0
+                        }
+                        assert.equal(sess, 1);
+                        done();
+                    });
+            });
+
+    }).timeout(5000);
+    it('/my_cart should have status 200', (done)=>{
+        body = {};
+        body.email = "T3STER1@AJZSHOE.COM";
+        body.pwd = "Asdf12345";
+        server
+            .post('/login')
+            .send(body)
+            .expect(302)
+            .end((err, res)=> {
+                if (err){
+                    console.log(err)
+                }
+                server
+                    .get('/my_cart')
+                    .expect(200)
                     .end((err,res1) => {
                         if (err){
                             console.log(err)
@@ -204,33 +203,80 @@ describe('server.js', function () {
                     });
             });
 
+    }).timeout(5000);
+
+    it('Removing from cart /my_cart should have status 200', (done)=>{
+        body = {};
+        body.email = "T3STER1@AJZSHOE.COM";
+        body.pwd = "Asdf12345";
+        body.item_id = "5cd4fb1e1c9d4400008b3f0b";
+        body.remove_num = "2";
+        body.quantity = "1";
+        server
+            .post('/login')
+            .send(body)
+            .expect(302)
+            .end((err, res)=> {
+                if (err){
+                    console.log(err)
+                }
+                server
+                    .post('/delete-item')
+                    .send(body)
+                    .expect(302)
+                    .end((err, res2) => {
+                        if (err){
+                            console.log(err)
+                        }
+                        server
+                            .get('/my_cart')
+                            .expect(200)
+                            .end((err,res3) => {
+                                if (err) {
+                                    console.log(err)
+                                }
+                                done();
+                            })
+
+                    });
+            });
+
+    }).timeout(5000);
+
+    it('check remove /my_cart should have status 200', (done)=> {
+        body = {};
+        body.email = "T3STER1@AJZSHOE.COM";
+        body.pwd = "Asdf12345";
+        server
+            .post('/login')
+            .send(body)
+            .expect(302)
+            .end((err, res)=> {
+                if (err){
+                    console.log(err)
+                }
+                console.log(res.res.text)
+                server
+                    .get('/my_cart')
+                    .expect(200)
+                    .end((err,res1) => {
+                        if (err){
+                            console.log(err)
+                        }
+                        if (res1.res.text.includes('Air Max')){
+                            sess = 1
+                        }else {
+                            sess = 0
+                        }
+                        assert.equal(sess, 0);
+                        done();
+                    });
+            });
     });
-    // it('/my_cart DELETE should have status 200', (done)=>{
-    //     body = {};
-    //     body.email = "T3STER1@AJZSHOE.COM";
-    //     body.pwd = "Asdf12345";
-    //     body.item_id = "5cd4fb1e1c9d4400008b3f0b";
-    //     server
-    //         .post('/login')
-    //         .send(body)
-    //         .expect(200)
-    //         .end((err, res)=> {
-    //             if (err){
-    //                 console.log(err)
-    //             }
-    //             server
-    //                 .post('/delete-item')
-    //                 .expect(302)
-    //                 .end((err,res1) => {
-    //                     if (err){
-    //                         console.log(err)
-    //                     }
-    //                     assert.equal(res.status, 302);
-    //                     mock.teardown();
-    //                     done()
-    //
-    //                 });
-    //         });
-    //
-    // }).timeout(5000)
+
+    it('TEARDOWN', (done)=> {
+        mock.teardown();
+        done()
+    });
+
 });
