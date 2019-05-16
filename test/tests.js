@@ -5,6 +5,7 @@ const mock = require('../test/mock_data.js');
 
 describe('server.js', function () {
     it('/ endpoint should render homepage', function (done) {
+        mock.setupShoe();
         server
             .get('/')
             .expect(200)
@@ -110,7 +111,7 @@ describe('server.js', function () {
         body = {};
         body.email = "T3STER1@AJZSHOE.COM";
         body.pwd = "Asdf12345";
-        body.objectid = '5cd4fb1e1c9d4400008b3f0b';
+        body.objectid = '5cddd9e8d6c0070017b6080a';
         server
             .post('/login')
             .send(body)
@@ -209,7 +210,7 @@ describe('server.js', function () {
         body = {};
         body.email = "T3STER1@AJZSHOE.COM";
         body.pwd = "Asdf12345";
-        body.item_id = "5cd4fb1e1c9d4400008b3f0b";
+        body.item_id = "5cddd9e8d6c0070017b6080a";
         body.remove_num = "2";
         body.quantity = "1";
         server
@@ -255,7 +256,7 @@ describe('server.js', function () {
                 if (err){
                     console.log(err)
                 }
-                console.log(res.res.text)
+                console.log(res.res.text);
                 server
                     .get('/my_cart')
                     .expect(200)
