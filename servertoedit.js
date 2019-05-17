@@ -334,36 +334,36 @@ app.post('/delete-item', redirectLogin, (request, response)=> {
     });
 });
 
-app.post("/addProduct", (req, res) => {
-    utils.getDb().collection("Accounts").findOne({email: req.session.userId}, (err, result) => {
-        if (result.isAdmin) {
-            let name = req.body.name;
-            let type = req.body.type;
-            let color = req.body.color;
-            let price = req.body.price;
-            let image = req.body.image;
-            let description = req.body.description;
-            utils.getDb().collection("Shoes").insertOne(
-                {
-                    name: name,
-                    type: type,
-                    color: color,
-                    price: price,
-                    path: image,
-                    description: description
-                }, function (err, result1) {
-                    if (err)
-                        console.log(err);
-                    else
-                        setTimeout(function () {
-                            res.redirect("/shop");
-                        }, 2000);
-                });
-
-        } else
-            res.redirect("/");
-    });
-});
+// app.post("/addProduct", (req, res) => {
+//     utils.getDb().collection("Accounts").findOne({email: req.session.userId}, (err, result) => {
+//         if (result.isAdmin) {
+//             let name = req.body.name;
+//             let type = req.body.type;
+//             let color = req.body.color;
+//             let price = req.body.price;
+//             let image = req.body.image;
+//             let description = req.body.description;
+//             utils.getDb().collection("Shoes").insertOne(
+//                 {
+//                     name: name,
+//                     type: type,
+//                     color: color,
+//                     price: price,
+//                     path: image,
+//                     description: description
+//                 }, function (err, result1) {
+//                     if (err)
+//                         console.log(err);
+//                     else
+//                         setTimeout(function () {
+//                             res.redirect("/shop");
+//                         }, 2000);
+//                 });
+//
+//         } else
+//             res.redirect("/");
+//     });
+// });
 
 app.get("/db", (req, res) => {
 
@@ -412,6 +412,7 @@ app.post('/registerAdmin', (req, res) => {
 app.post("/addProduct", (req, res) => {
     utils.getDb().collection("Accounts").findOne({email: req.session.userId}, (err, result) => {
         if (result.isAdmin) {
+            let id = ObjectId(req.body._id);
             let name = req.body.name;
             let type = req.body.type;
             let color = req.body.color;
@@ -421,6 +422,7 @@ app.post("/addProduct", (req, res) => {
 
             utils.getDb().collection("Shoes").insertOne(
                 {
+                    _id: id,
                     name: name,
                     type: type,
                     color: color,
