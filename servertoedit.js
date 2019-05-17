@@ -132,15 +132,9 @@ app.get('/shop', redirectLogin, (request, response) => {
         }
         if (!docs){
             throw err;
-        }else {
-            var productChunks = [];
-            var chunkSize = 3;
-            for (var i = 0; i < docs.length; i+= chunkSize) {
-                productChunks.push(docs.slice(i, i + chunkSize));
-            }
+        }
 			//console.log(productChunks);
-			var itemname = docs['name'];
-            db.collection("Accounts").findOne({email: `${request.session.userId}`}, (err, result) => {
+            db.collection("Accounts").findOne({email: request.session.userId}, (err, result) => {
 			   response.render('shop.hbs',{
 					itemerror: false,
                     admin: result.isAdmin,
@@ -150,12 +144,13 @@ app.get('/shop', redirectLogin, (request, response) => {
 					
                 })
 
-            })
+            });
 
 
-    });
+    
 });
-}
+	});
+
 
 //
 //Shop page end
@@ -198,7 +193,6 @@ app.get('/home', redirectLogin, (req, res) => {
     //})
 });
 
-<<<<<<< HEAD
 
 app.get('/login', redirectHome, (req, res) => {
     //console.log(req.session);
@@ -213,8 +207,6 @@ app.get('/register', redirectHome, (req, res) => {
 
 });
 
-=======
->>>>>>> b00fbc3e1cdef633e7135408329cca1fb8e39417
 app.post('/login', redirectHome, (req, res) => {
     var db = utils.getDb();
     db.collection('Accounts').find({email: `${req.body.email}`}).toArray().then(function (feedbacks) {
