@@ -1,33 +1,14 @@
 
-{{#each products}}
-    <div class="container">
-		<div class="row">
-			{{# each this}}
-				<div class="col">
-					<!--Card -->
-					<div class="card">
-						<input type="image" form="additem" class="card-img-top" src="{{path}}" alt="{{id}}" onclick="itemadded()">
-							<div class="card-body">
-								<ul class="list-group list-group-flush">
-									<li class="list-group-item" id="type">Type: {{type}}</li>
-									<li class="list-group-item" id="name">Name: {{name}}</li>
-									<li class="list-group-item" id="color">Color: {{color}}</li>
-									<li class="list-group-item" id="price">Price: ${{price}}</li>
-									
-									<li class="list-group-item">
-										<form id="additem" action="/add-to-cart" method="post">
-										<input type="submit" value="Add to cart" class="btn btn-primary-custom" onclick="itemadded()">
-										<input type="hidden" value="{{_id}}" name="objectid">
-										</form>
-									</li>
-								</ul>
-							</div>
-						</div>
-					<!--Card end-->
-				</div>
-			{{/each}}
-		</div>
-	</div>
-{{/each}}
+
+        {{#each products}}
+            <!--Card 1 -->
+            <div class="card mt-5 bg-light" style="width: 18rem; margin: 5%;">
+                <div class="img-hover-zoom img-responsive">
+                    <a href="/product/{{this._id}}"><img class="card-img-top" id="img" src="{{this.path}}" alt="{{this.name}}"></a>
+                </div>
+                <div class="card-body">
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item" id="type"><h4>{{this.type}} {{this.name}}</h4></li>
 
 

@@ -27,6 +27,24 @@ describe('server.js', function () {
             });
     });
 
+    it("/logout should clear the cookie", (done) => {
+        server
+            .get('/logout')
+            .expect(200)
+            .end((err, res) => {
+                assert.equal(res.status, 302);
+                try{
+                    let sess = res.headers["set-cookie"][0].includes('sid=;');
+                    assert.equal(sess, true);
+                }
+                catch (e) {
+                    let sess = res.headers["set-cookie"] === undefined;
+                    assert.equal(sess, true);
+                }
+                done()
+            });
+    });
+
     it('/admin shop status is 200', (done)=>{
         body = {};
         body.email = "T3STER2@AJZSHOE.COM";
@@ -179,24 +197,6 @@ describe('server.js', function () {
 
     });
 
-
-    it("/logout should clear the cookie", (done) => {
-        server
-            .get('/logout')
-            .expect(200)
-            .end((err, res) => {
-                assert.equal(res.status, 302);
-                try{
-                    let sess = res.headers["set-cookie"][0].includes('sid=;');
-                    assert.equal(sess, true);
-                }
-                catch (e) {
-                    let sess = res.headers["set-cookie"] === undefined;
-                    assert.equal(sess, true);
-                }
-                done()
-            });
-    });
 
     it('TEARDOWNADMIN', (done)=> {
         mock.teardownadmin();
