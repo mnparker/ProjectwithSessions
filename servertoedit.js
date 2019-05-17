@@ -342,7 +342,7 @@ app.post('/add-to-cart', redirectLogin,(request, response)=> {
                     db.collection('Accounts').updateOne({"email": request.session.userId, "cart.item_id": doc._id},
                         {
                             $inc: {
-                                "cart.$.quantity": quantity
+                                "cart.$.quantity": +quantity
                             }
                         })
                 }
