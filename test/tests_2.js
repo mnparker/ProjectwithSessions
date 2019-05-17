@@ -198,7 +198,7 @@ describe('server.js', function () {
             });
     });
 
-    it('TEARDOWN', (done)=> {
+    it('TEARDOWNADMIN', (done)=> {
         mock.teardownadmin();
         done()
     });
