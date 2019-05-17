@@ -1,6 +1,6 @@
 <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
-    <div class="modal-content custommodal">
+    <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">Log In</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -13,16 +13,14 @@
         <form action="/login" method="post" id="loginForm">
             <label>E-mail:</label><br> <input id="email" name="email" type="email" size="20" required><br>
             <label>Password:</label><br> <input id="pwd" name="pwd" type="password" size="20" required><br>
-
-
-			<br>
-            <a data-dismiss="modal" aria-label="Close" data-toggle="modal" href="#exampleModal"><p class="text-dark" >Don't have an account yet?</p></a>
+            <br>
+            <a data-dismiss="modal" aria-label="Close" data-toggle="modal" href="#exampleModal">Don't have an account yet?</a>
             <div class="modal-footer">
-			<div class='alertcontainer'>
+			<div class='container'>
 					{{>loginalert}}
 			</div>
-                <button type="button" class="btn btn-secondary-custom" data-dismiss="modal">Close</button>
-                <input value="Login" type="submit" form="loginForm" class="btn btn-primary-custom">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <input value="Login" type="submit" form="loginForm" class="btn btn-primary">
             </div>
         </form>
     </div>
