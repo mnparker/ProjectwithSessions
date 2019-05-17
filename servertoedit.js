@@ -9,7 +9,6 @@ const expressValidator = require('express-validator');
 var ObjectId = require('mongodb').ObjectID;
 const MongoDBStore = require('connect-mongodb-session')(session);
 var app = express();
-
 app.use(expressValidator());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -24,9 +23,12 @@ app.use(express.static('public'))
 
 
 var store = new MongoDBStore({
+	//url: 'mongodb://localhost:27017',
     uri: 'mongodb+srv://admin:mongodb@agileproject-qha9t.mongodb.net/projectdb?retryWrites=true',
     collection: 'mySessions'
 });
+var db = utils.getDb();
+
 
 const {
     PORT = 8080,
@@ -111,7 +113,8 @@ app.get('/my_cart', redirectLogin, (request, response) => {
         response.render('my_cart.hbs',{
             products: cart_list,
             total_price: total,
-            username: request.session.userId
+            username: request.session.userId,
+			colorMode: docs[0].colorMode
         })
     });
 });
@@ -121,7 +124,7 @@ app.get('/my_cart', redirectLogin, (request, response) => {
 
 
 app.get('/shop', redirectLogin, (request, response) => {
-
+	
     var db = utils.getDb();
     db.collection('Shoes').find({}).toArray((err, docs) => {
         if (err) {
@@ -136,13 +139,15 @@ app.get('/shop', redirectLogin, (request, response) => {
             for (var i = 0; i < docs.length; i+= chunkSize) {
                 productChunks.push(docs.slice(i, i + chunkSize));
             }
-			console.log(productChunks);
+			//console.log(productChunks);
 			var itemname = docs['name'];
-            db.collection("Accounts").findOne({email: request.session.userId}, (err, result) => {
-                response.render('shop.hbs',{
+            db.collection("Accounts").findOne({email: `${request.session.userId}`}, (err, result) => {
+			   response.render('shop.hbs',{
                     admin: result.isAdmin,
                     products: productChunks,
-                    username: request.session.userId
+                    username: request.session.userId,
+					colorMode: result.colorMode,
+					
                 })
 
             })
@@ -158,6 +163,7 @@ app.get('/',(req, res) => {
     //const { userId} = req.session.userId
     if('userId' in req.session){
         res.redirect('/home')
+		
         // res.render('home.hbs',{
         //     username: req.session.userId
         // })
@@ -174,10 +180,21 @@ app.get('/',(req, res) => {
 
 
 app.get('/home', redirectLogin, (req, res) => {
-    // const { user } = res.locals;
-    res.render('home.hbs', {
-        username: req.session.userId
+	var db = utils.getDb();
+
+	db.collection('Accounts').findOne({email: `${req.session.userId}`}, (err, doc) => {
+		res.render('home.hbs', {
+        username: req.session.userId,
+		colorMode: doc.colorMode
     })
+		
+	})
+    // const { user } = res.locals;
+	//console.log(req.session);
+    //res.render('home.hbs', {
+      //  username: req.session.userId,
+		//colorMode: req.session.colorMode
+    //})
 });
 
 
@@ -193,8 +210,6 @@ app.get('/register', redirectHome, (req, res) => {
     //res.render('sign_up_modal.hbs')
 
 });
-
-
 
 app.post('/login', redirectHome, (req, res) => {
     var db = utils.getDb();
@@ -240,9 +255,11 @@ app.post('/register', redirectHome, (req, res) => {
                     email: req.body.email,
                     pwd: bcryptjs.hashSync(req.body.pwd, salt),
                     cart: [],
-                    history: []
+                    history: [],
+					colorMode: 'normal'
                 });
                 req.session.userId = req.body.email;
+				req.session.colorMode = 'normal';
                 return res.redirect('/home')
             }else{
              res.render('homenotlog.hbs',{
@@ -258,6 +275,18 @@ app.post('/register', redirectHome, (req, res) => {
         }
     })
 });
+
+//////////////////////////////////////
+app.post('/changecolor/:color',(req, res) => {
+    var db = utils.getDb();
+	var color = req.params.color
+	//console.log('Current colour mode: ', color)
+    db.collection('Accounts').findOneAndUpdate({email: `${req.session.userId}` }, 
+		{$set:{colorMode:color}}
+	)
+      res.redirect('/home')
+});
+
 
 
 
